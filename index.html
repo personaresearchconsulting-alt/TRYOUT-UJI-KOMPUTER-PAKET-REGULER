@@ -247,7 +247,7 @@ margin-top:40px;
 
 <div id="loadingScreen" style="display: none;">
 <div class="loader"></div>
-<h3 style="color:#0f172a;font-weight:600;">Loading System...</h3>
+<h3 style="color:#0f172a;font-weight:600;">Menghubungkan ke Sistem...</h3>
 </div>
 
 <section id="loginPage" class="center-page">
@@ -318,7 +318,9 @@ margin-top:40px;
 </footer>
 
 <script>
-// DATABASE LIST PASSWORD RESMI
+// URL Google Apps Script yang sudah Anda miliki terpasang langsung di sini
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-mcX43rTZu8eJKJ-jkGygGrRsgsL92_ziKQSjnoaolIvXYKOVTPMENoHPVjIVkD1kcg/exec";
+
 const passwordList = [
 "PRC92KF","PRC51QM","PRC38XL","PRC74ZN","PRC16RT",
 "PRC83XB","PRC29VL","PRC64PT","PRC71KY","PRC55NF",
@@ -339,16 +341,12 @@ const dashboard = document.getElementById("dashboard");
 const popup = document.getElementById("popup");
 const welcomeText = document.getElementById("welcomeText");
 const countdown = document.getElementById("countdown");
+const loadingScreen = document.getElementById("loadingScreen");
 
-// GENERATE SIDIK JARI PERANGKAT UNTUK IDENTIFIKASI KUNCI DEVICE
 function getDeviceId(){
 const rawData = [
-navigator.userAgent,
-navigator.platform,
-navigator.language,
-screen.width,
-screen.height,
-window.devicePixelRatio,
+navigator.userAgent, navigator.platform, navigator.language,
+screen.width, screen.height, window.devicePixelRatio,
 Intl.DateTimeFormat().resolvedOptions().timeZone,
 navigator.hardwareConcurrency || "cpu"
 ].join("###");
@@ -370,55 +368,43 @@ popup.classList.remove("hidden");
 setTimeout(()=>{ popup.classList.add("hidden"); },2500);
 }
 
-// LOGIKA LOGIN DAN PENGIKATAN DEVICE (STANDALONE VIRTUAL LOCK)
-loginBtn.addEventListener("click",()=>{
-const input=passwordInput.value.trim();
+loginBtn.addEventListener("click",loginSystem);
+
+async function loginSystem(){
+const input = passwordInput.value.trim();
 if(!passwordList.includes(input)){
 showPopup("Password salah.");
 return;
 }
 
-const currentDeviceId = getDeviceId();
-const storedDeviceKey = "prc_lock_device_" + input;
-const storedTimeKey = "prc_lock_time_" + input;
+loadingScreen.style.display = "flex";
+const deviceId = getDeviceId();
 
-const registeredDevice = localStorage.getItem(storedDeviceKey);
-const registeredTime = localStorage.getItem(storedTimeKey);
+try {
+const response = await fetch(`${SCRIPT_URL}?password=${input}&deviceId=${deviceId}`);
+const result = await response.json();
 
-// Skenario 1: Jika password baru pertama kali diaktifkan di browser manapun
-if(!registeredDevice){
-const now = Date.now();
-localStorage.setItem(storedDeviceKey, currentDeviceId);
-localStorage.setItem(storedTimeKey, now);
+if(result.status === "success"){
 localStorage.setItem("loggedInUser", input);
+localStorage.setItem("userFirstLogin", result.firstLogin);
 showPopup("Login berhasil.");
-openDashboard(input, now);
-return;
+openDashboard(input, result.firstLogin);
+} else {
+showPopup(result.message);
+loadingScreen.style.display = "none";
 }
-
-// Skenario 2: Jika sidik jari device saat ini tidak cocok dengan device pendaftar awal
-if(registeredDevice !== currentDeviceId){
-showPopup("Password sudah dipakai di device lain.");
-return;
+} catch (error) {
+showPopup("Gagal sinkronisasi data online. Pastikan Web App Script aktif.");
+loadingScreen.style.display = "none";
 }
-
-// Skenario 3: Jika sudah lewat masa aktif tryout 30 hari
-const expired = Number(registeredTime) + (30*24*60*60*1000);
-if(Date.now() > expired){
-showPopup("Masa aktif habis.");
-return;
 }
-
-localStorage.setItem("loggedInUser", input);
-showPopup("Login berhasil.");
-openDashboard(input, Number(registeredTime));
-});
 
 function openDashboard(user, firstLoginTime){
 loginPage.classList.add("hidden");
 dashboard.classList.remove("hidden");
+loadingScreen.style.display = "none";
 welcomeText.innerHTML=`Login sebagai: <b>${user}</b>`;
-startCountdown(firstLoginTime);
+startCountdown(Number(firstLoginTime));
 }
 
 let countdownInterval=null;
@@ -431,7 +417,7 @@ const diff = end - Date.now();
 if(diff <= 0){
 countdown.innerText="Expired";
 clearInterval(countdownInterval);
-localStorage.removeItem("loggedInUser");
+localStorage.clear();
 setTimeout(()=>{ location.reload(); }, 2000);
 return;
 }
@@ -443,33 +429,17 @@ countdown.innerText=`${days}H ${hours}J ${minutes}M`;
 },1000);
 }
 
-// AUTO LOGIN INSTAN (SAY NO TO LOADING)
 const loggedUser = localStorage.getItem("loggedInUser");
-if(loggedUser && passwordList.includes(loggedUser)){
-const storedDeviceKey = "prc_lock_device_" + loggedUser;
-const storedTimeKey = "prc_lock_time_" + loggedUser;
-const registeredDevice = localStorage.getItem(storedDeviceKey);
-const registeredTime = localStorage.getItem(storedTimeKey);
-
-if(registeredDevice === getDeviceId()){
-const expired = Number(registeredTime) + (30*24*60*60*1000);
-if(Date.now() <= expired){
-openDashboard(loggedUser, Number(registeredTime));
-} else {
-localStorage.removeItem("loggedInUser");
-}
-} else {
-localStorage.removeItem("loggedInUser");
-}
+const localFirstLogin = localStorage.getItem("userFirstLogin");
+if(loggedUser && localFirstLogin && passwordList.includes(loggedUser)){
+openDashboard(loggedUser, localFirstLogin);
 }
 
-// LOGOUT
 document.getElementById("logoutBtn").addEventListener("click",()=>{
-localStorage.removeItem("loggedInUser");
+localStorage.clear();
 location.reload();
 });
 
-// ANTI INSPECT & SECURITY COPY PROTOCOL
 document.addEventListener("contextmenu",e=>e.preventDefault());
 document.addEventListener("keydown",e=>{
 if(e.key==="F12"||(e.ctrlKey&&e.shiftKey&&e.key==="I")||(e.ctrlKey&&e.key==="u")){
@@ -477,14 +447,12 @@ e.preventDefault();
 }
 });
 
-// NAVIGASI LINK TOMBOL MENU TRYOUT
 document.querySelectorAll(".menu-card").forEach(card=>{
 card.addEventListener("click",()=>{
 const target=card.getAttribute("data-link");
 if(target) window.location.href=target;
 });
 });
-
 </script>
 </body>
 </html>
