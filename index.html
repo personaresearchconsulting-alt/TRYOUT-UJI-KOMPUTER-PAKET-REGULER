@@ -6,10 +6,13 @@
 
 <title>TRYOUT SIMULASI CAT UJI KOMPUTER</title>
 
+<link rel="dns-prefetch" href="//fonts.googleapis.com">
+<link rel="dns-prefetch" href="//fonts.gstatic.com">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 
@@ -43,19 +46,17 @@ z-index:99999;
 }
 
 .loader{
-width:70px;
-height:70px;
+width:60px;
+height:60px;
 border-radius:50%;
-border:6px solid rgba(15,23,42,.1);
-border-top:6px solid #0f172a;
-animation:spin 1s linear infinite;
-margin-bottom:20px;
+border:5px solid rgba(15,23,42,.1);
+border-top:5px solid #0f172a;
+animation:spin .8s linear infinite;
+margin-bottom:18px;
 }
 
 @keyframes spin{
-100%{
-transform:rotate(360deg);
-}
+100%{ transform:rotate(360deg); }
 }
 
 .center-page{
@@ -78,18 +79,12 @@ max-width:450px;
 padding:40px;
 border-radius:25px;
 text-align:center;
-animation:fade .8s ease;
+animation:fade .5s ease;
 }
 
 @keyframes fade{
-from{
-opacity:0;
-transform:translateY(30px);
-}
-to{
-opacity:1;
-transform:translateY(0);
-}
+from{ opacity:0; transform:translateY(20px); }
+to{ opacity:1; transform:translateY(0); }
 }
 
 .login-card h1{
@@ -138,9 +133,8 @@ font-weight:600;
 }
 
 .login-btn:hover{
-transform:translateY(-4px);
+transform:translateY(-3px);
 background:#1e88e5;
-box-shadow:0 4px 12px rgba(33,150,243,.3);
 }
 
 #dashboard{
@@ -194,7 +188,7 @@ text-align:center;
 font-weight:600;
 font-size:17px;
 cursor:pointer;
-transition:.3s;
+transition:.25s;
 background:linear-gradient(135deg,#0b2447,#19376d);
 border:1px solid rgba(255,255,255,.1);
 color:#ffffff;
@@ -215,10 +209,8 @@ font-weight:400;
 }
 
 .menu-card:hover{
-transform:translateY(-7px);
+transform:translateY(-5px);
 background:linear-gradient(135deg,#19376d,#254b8c);
-border-color:#d4af37;
-box-shadow:0 15px 25px rgba(11,36,71,.3);
 }
 
 .popup{
@@ -242,83 +234,81 @@ border-top:1px solid #e2e8f0;
 margin-top:40px;
 }
 
+@media(max-width:768px){
+.login-card{ padding:30px 22px; }
+.login-card h1{ font-size:23px; }
+#dashboard{ padding:20px; }
+}
+
 </style>
 </head>
 
 <body>
 
-<div id="loadingScreen">
+<div id="loadingScreen" style="display: none;">
 <div class="loader"></div>
-<h2 style="color:#0f172a;">Loading Tryout System...</h2>
+<h3 style="color:#0f172a;font-weight:600;">Loading System...</h3>
 </div>
 
 <section id="loginPage" class="center-page">
-
 <div class="glass login-card">
-
 <h1>TRYOUT SIMULASI CAT UJI KOMPUTER</h1>
-
-<p class="subtitle">
-PERSONA RESEARCH & CONSULTING
-</p>
-
+<p class="subtitle">PERSONA RESEARCH & CONSULTING</p>
 <input type="password" id="passwordInput" placeholder="Masukkan Password">
-
-<button class="login-btn" id="loginBtn">
-LOGIN
-</button>
-
+<button class="login-btn" id="loginBtn">LOGIN</button>
 </div>
-
 </section>
 
 <section id="dashboard" class="hidden">
-
 <div class="topbar">
-
 <div>
 <h2>TRYOUT MENU – PAKET REGULER</h2>
 <p id="welcomeText" style="color:#475569;margin-top:4px;"></p>
 </div>
-
 <div class="top-right">
-
-<div class="count-box" id="countdown">
-Loading...
+<div class="count-box" id="countdown">Loading...</div>
+<button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
-
-<button class="logout-btn" id="logoutBtn">
-Logout
-</button>
-
-</div>
-
 </div>
 
 <div class="menu-grid">
-
+<div class="menu-card pdf-card" data-link="Materi_Lengkap_Biner.pdf">
+<span>📖 BUKU SAKU BINER</span>
+<small>Materi & Teori Dasar</small>
+</div>
 <div class="menu-card" data-link="words_studikasus_1.html">
 <span>MS WORDS</span>
 <small>Advanced & Tata Naskah</small>
 </div>
-
 <div class="menu-card" data-link="excel_studikasus_1.html">
-<span>MS EXCEL</span>
+<span>MS EXCEL SERI 1</span>
 <small>Antarmuka & Statistik Dasar</small>
 </div>
-
-<div class="menu-card" data-link="ppt_studikasus_1.html">
-<span>POWER POINT</span>
-<small>Administrasi Paparan</small>
+<div class="menu-card" data-link="excel_studikasus_2.html">
+<span>MS EXCEL SERI 2</span>
+<small>String, Logika & Optimasi</small>
 </div>
-
+<div class="menu-card" data-link="ppt_studikasus_1.html">
+<span>POWER POINT SERI 1</span>
+<small>Administrasi Paparan & Master</small>
+</div>
+<div class="menu-card" data-link="ppt_studikasus_2.html">
+<span>POWER POINT SERI 2</span>
+<small>Visual Data & Multimedia</small>
+</div>
+<div class="menu-card" data-link="intenet_studikasus_1.html">
+<span>INTERNET & NETWORK</span>
+<small>Infrastruktur & Ops Digital</small>
+</div>
 <div class="menu-card" data-link="uji_komputer_1.html">
 <span>UJI KOMPUTER MIX</span>
-<small>Simulasi CAT</small>
+<small>Infrastruktur & Ops Digital</small>
 </div>
-
+<div class="menu-card" data-link="biner_1.html">
+<span>SISTEM BINER</span>
+<small>Paket Khusus Biner</small>
 </div>
-
+</div>
 </section>
 
 <div id="popup" class="popup hidden"></div>
@@ -327,63 +317,20 @@ Logout
 © PERSONA RESEARCH & CONSULTING
 </footer>
 
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-getDatabase,
-ref,
-get,
-set,
-update
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-//////////////////////////////////////////////////
-// FIREBASE CONFIG
-//////////////////////////////////////////////////
-
-const firebaseConfig = {
-
-apiKey: "ISI_APIKEY",
-authDomain: "ISI_AUTHDOMAIN",
-databaseURL: "ISI_DATABASE_URL",
-projectId: "ISI_PROJECT_ID",
-storageBucket: "ISI_STORAGE_BUCKET",
-messagingSenderId: "ISI_SENDER_ID",
-appId: "ISI_APP_ID"
-
-};
-
-//////////////////////////////////////////////////
-// FIREBASE INIT
-//////////////////////////////////////////////////
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-//////////////////////////////////////////////////
-// PASSWORD LIST
-//////////////////////////////////////////////////
-
+<script>
+// DATABASE LIST PASSWORD RESMI
 const passwordList = [
-
-"PRC92KF", "PRC51QM", "PRC38XL", "PRC74ZN", "PRC16RT",
-"PRC83XB", "PRC29VL", "PRC64PT", "PRC71KY", "PRC55NF",
-"PRC42QD", "PRC38MR", "PRC74XH", "PRC61PJ", "PRC27LW",
-"PRC84TC", "PRC53KN", "PRC19XU", "PRC67RE", "PRC41VV",
-"PRC88MG", "PRC25QS", "PRC73NK", "PRC90LV", "PRC36XI",
-"PRC52PO", "PR7KA", "PRC99QB", "PRC44LC", "PRC88ND",
-"PRC22XE", "PRC66RF", "PRC11PG", "PRC55VH", "PRC77MJ",
-"PRC33TK", "PRC99XL", "PRC44KM", "PRC88QN", "PRC22LP",
-"PRC66NQ", "PRC11XR", "PRC55RS", "PRC77PT", "PRC33UV",
-"PRC99VM", "PRC44WT", "PRC88XK", "PRC22YQ", "PRC66ZL"
-
+"PRC92KF","PRC51QM","PRC38XL","PRC74ZN","PRC16RT",
+"PRC83XB","PRC29VL","PRC64PT","PRC71KY","PRC55NF",
+"PRC42QD","PRC38MR","PRC74XH","PRC61PJ","PRC27LW",
+"PRC84TC","PRC53KN","PRC19XU","PRC67RE","PRC41VV",
+"PRC88MG","PRC25QS","PRC73NK","PRC90LV","PRC36XI",
+"PRC52PO","PR7KA","PRC99QB","PRC44LC","PRC88ND",
+"PRC22XE","PRC66RF","PRC11PG","PRC55VH","PRC77MJ",
+"PRC33TK","PRC99XL","PRC44KM","PRC88QN","PRC22LP",
+"PRC66NQ","PRC11XR","PRC55RS","PR77PT","PRC33UV",
+"PRC99VM","PRC44WT","PRC88XK","PRC22YQ","PRC66ZL"
 ];
-
-//////////////////////////////////////////////////
-// ELEMENT
-//////////////////////////////////////////////////
 
 const loginBtn = document.getElementById("loginBtn");
 const passwordInput = document.getElementById("passwordInput");
@@ -393,320 +340,151 @@ const popup = document.getElementById("popup");
 const welcomeText = document.getElementById("welcomeText");
 const countdown = document.getElementById("countdown");
 
-//////////////////////////////////////////////////
-// LOADING
-//////////////////////////////////////////////////
-
-window.onload = ()=>{
-
-setTimeout(()=>{
-
-document.getElementById("loadingScreen")
-.style.display = "none";
-
-},1500);
-
-};
-
-//////////////////////////////////////////////////
-// DEVICE FINGERPRINT
-//////////////////////////////////////////////////
-
+// GENERATE SIDIK JARI PERANGKAT UNTUK IDENTIFIKASI KUNCI DEVICE
 function getDeviceId(){
-
 const rawData = [
-
 navigator.userAgent,
 navigator.platform,
 navigator.language,
-
 screen.width,
 screen.height,
-
 window.devicePixelRatio,
-
-Intl.DateTimeFormat()
-.resolvedOptions()
-.timeZone,
-
+Intl.DateTimeFormat().resolvedOptions().timeZone,
 navigator.hardwareConcurrency || "cpu"
-
 ].join("###");
-
 return generateHash(rawData);
-
 }
 
 function generateHash(str){
-
 let hash = 0;
-
-for(let i = 0; i < str.length; i++){
-
-hash =
-((hash << 5) - hash)
-+ str.charCodeAt(i);
-
-hash |= 0;
-
+for(let i=0;i<str.length;i++){
+hash=((hash<<5)-hash)+str.charCodeAt(i);
+hash|=0;
 }
-
-return "PRC-" + Math.abs(hash);
-
+return "PRC-"+Math.abs(hash);
 }
-
-//////////////////////////////////////////////////
-// POPUP
-//////////////////////////////////////////////////
 
 function showPopup(text){
-
-popup.innerText = text;
-
+popup.innerText=text;
 popup.classList.remove("hidden");
-
-setTimeout(()=>{
-
-popup.classList.add("hidden");
-
-},3000);
-
+setTimeout(()=>{ popup.classList.add("hidden"); },2500);
 }
 
-//////////////////////////////////////////////////
-// LOGIN SYSTEM
-//////////////////////////////////////////////////
-
-loginBtn.addEventListener("click", loginSystem);
-
-async function loginSystem(){
-
-const input = passwordInput.value.trim();
-
+// LOGIKA LOGIN DAN PENGIKATAN DEVICE (STANDALONE VIRTUAL LOCK)
+loginBtn.addEventListener("click",()=>{
+const input=passwordInput.value.trim();
 if(!passwordList.includes(input)){
-
 showPopup("Password salah.");
 return;
-
 }
 
-const deviceId = getDeviceId();
+const currentDeviceId = getDeviceId();
+const storedDeviceKey = "prc_lock_device_" + input;
+const storedTimeKey = "prc_lock_time_" + input;
 
-const userRef =
-ref(db, "accounts/" + input);
+const registeredDevice = localStorage.getItem(storedDeviceKey);
+const registeredTime = localStorage.getItem(storedTimeKey);
 
-const snapshot =
-await get(userRef);
-
-//////////////////////////////////////////////////
-// FIRST LOGIN
-//////////////////////////////////////////////////
-
-if(!snapshot.exists()){
-
-await set(userRef, {
-
-deviceId: deviceId,
-firstLogin: Date.now(),
-lastLogin: Date.now()
-
-});
-
-localStorage.setItem(
-"loggedInUser",
-input
-);
-
+// Skenario 1: Jika password baru pertama kali diaktifkan di browser manapun
+if(!registeredDevice){
+const now = Date.now();
+localStorage.setItem(storedDeviceKey, currentDeviceId);
+localStorage.setItem(storedTimeKey, now);
+localStorage.setItem("loggedInUser", input);
 showPopup("Login berhasil.");
-
-openDashboard(input);
-
+openDashboard(input, now);
 return;
-
 }
 
-//////////////////////////////////////////////////
-// VALIDASI DEVICE
-//////////////////////////////////////////////////
-
-const data = snapshot.val();
-
-if(data.deviceId !== deviceId){
-
+// Skenario 2: Jika sidik jari device saat ini tidak cocok dengan device pendaftar awal
+if(registeredDevice !== currentDeviceId){
 showPopup("Password sudah dipakai di device lain.");
 return;
-
 }
 
-//////////////////////////////////////////////////
-// EXPIRED CHECK
-//////////////////////////////////////////////////
-
-const expired =
-data.firstLogin +
-(30 * 24 * 60 * 60 * 1000);
-
+// Skenario 3: Jika sudah lewat masa aktif tryout 30 hari
+const expired = Number(registeredTime) + (30*24*60*60*1000);
 if(Date.now() > expired){
-
 showPopup("Masa aktif habis.");
 return;
-
 }
 
-//////////////////////////////////////////////////
-// UPDATE LOGIN
-//////////////////////////////////////////////////
-
-await update(userRef, {
-
-lastLogin: Date.now()
-
+localStorage.setItem("loggedInUser", input);
+showPopup("Login berhasil.");
+openDashboard(input, Number(registeredTime));
 });
 
-localStorage.setItem(
-"loggedInUser",
-input
-);
-
-showPopup("Login berhasil.");
-
-openDashboard(input);
-
-}
-
-//////////////////////////////////////////////////
-// DASHBOARD
-//////////////////////////////////////////////////
-
-function openDashboard(user){
-
+function openDashboard(user, firstLoginTime){
 loginPage.classList.add("hidden");
-
 dashboard.classList.remove("hidden");
-
-welcomeText.innerHTML =
-`Login sebagai: <b>${user}</b>`;
-
-startCountdown(user);
-
+welcomeText.innerHTML=`Login sebagai: <b>${user}</b>`;
+startCountdown(firstLoginTime);
 }
 
-//////////////////////////////////////////////////
-// COUNTDOWN
-//////////////////////////////////////////////////
-
-async function startCountdown(user){
-
-setInterval(async()=>{
-
-const userRef =
-ref(db, "accounts/" + user);
-
-const snapshot =
-await get(userRef);
-
-if(!snapshot.exists()) return;
-
-const data = snapshot.val();
-
-const end =
-data.firstLogin +
-(30 * 24 * 60 * 60 * 1000);
-
+let countdownInterval=null;
+function startCountdown(firstLoginTime){
+clearInterval(countdownInterval);
+countdownInterval=setInterval(()=>{
+const end = firstLoginTime + (30*24*60*60*1000);
 const diff = end - Date.now();
 
 if(diff <= 0){
-
-countdown.innerText = "Expired";
-return;
-
-}
-
-const days =
-Math.floor(diff / (1000*60*60*24));
-
-const hours =
-Math.floor((diff/(1000*60*60))%24);
-
-const minutes =
-Math.floor((diff/(1000*60))%60);
-
-countdown.innerText =
-`${days}H ${hours}J ${minutes}M`;
-
-},1000);
-
-}
-
-//////////////////////////////////////////////////
-// AUTO LOGIN
-//////////////////////////////////////////////////
-
-const loggedUser =
-localStorage.getItem("loggedInUser");
-
-if(loggedUser){
-
-openDashboard(loggedUser);
-
-}
-
-//////////////////////////////////////////////////
-// LOGOUT
-//////////////////////////////////////////////////
-
-document.getElementById("logoutBtn")
-.addEventListener("click",()=>{
-
+countdown.innerText="Expired";
+clearInterval(countdownInterval);
 localStorage.removeItem("loggedInUser");
+setTimeout(()=>{ location.reload(); }, 2000);
+return;
+}
 
+const days=Math.floor(diff/(1000*60*60*24));
+const hours=Math.floor((diff/(1000*60*60))%24);
+const minutes=Math.floor((diff/(1000*60))%60);
+countdown.innerText=`${days}H ${hours}J ${minutes}M`;
+},1000);
+}
+
+// AUTO LOGIN INSTAN (SAY NO TO LOADING)
+const loggedUser = localStorage.getItem("loggedInUser");
+if(loggedUser && passwordList.includes(loggedUser)){
+const storedDeviceKey = "prc_lock_device_" + loggedUser;
+const storedTimeKey = "prc_lock_time_" + loggedUser;
+const registeredDevice = localStorage.getItem(storedDeviceKey);
+const registeredTime = localStorage.getItem(storedTimeKey);
+
+if(registeredDevice === getDeviceId()){
+const expired = Number(registeredTime) + (30*24*60*60*1000);
+if(Date.now() <= expired){
+openDashboard(loggedUser, Number(registeredTime));
+} else {
+localStorage.removeItem("loggedInUser");
+}
+} else {
+localStorage.removeItem("loggedInUser");
+}
+}
+
+// LOGOUT
+document.getElementById("logoutBtn").addEventListener("click",()=>{
+localStorage.removeItem("loggedInUser");
 location.reload();
-
 });
 
-//////////////////////////////////////////////////
-// ANTI INSPECT
-//////////////////////////////////////////////////
-
-document.addEventListener("contextmenu",e=>{
+// ANTI INSPECT & SECURITY COPY PROTOCOL
+document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("keydown",e=>{
+if(e.key==="F12"||(e.ctrlKey&&e.shiftKey&&e.key==="I")||(e.ctrlKey&&e.key==="u")){
 e.preventDefault();
+}
 });
 
-document.addEventListener("keydown",(e)=>{
-
-if(e.key==="F12"){
-e.preventDefault();
-}
-
-if(e.ctrlKey && e.shiftKey && e.key==="I"){
-e.preventDefault();
-}
-
-if(e.ctrlKey && e.key==="u"){
-e.preventDefault();
-}
-
-});
-
-//////////////////////////////////////////////////
-// MENU NAVIGATION
-//////////////////////////////////////////////////
-
-document.querySelectorAll(".menu-card")
-.forEach(card=>{
-
+// NAVIGASI LINK TOMBOL MENU TRYOUT
+document.querySelectorAll(".menu-card").forEach(card=>{
 card.addEventListener("click",()=>{
-
-const target =
-card.getAttribute("data-link");
-
-window.location.href = target;
-
+const target=card.getAttribute("data-link");
+if(target) window.location.href=target;
 });
-
 });
 
 </script>
-
 </body>
 </html>
