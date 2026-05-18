@@ -21,7 +21,7 @@ font-family:'Poppins',sans-serif;
 }
 
 body{
-background:#f1f5f9; /* Latar belakang utama putih abu-abu terang yang bersih */
+background:#f1f5f9;
 min-height:100vh;
 overflow-x:hidden;
 color:#0f172a;
@@ -116,7 +116,7 @@ background:#f8fafc;
 color:#0f172a;
 }
 
-input:focus {
+input:focus{
 border-color:#2196f3;
 background:#ffffff;
 }
@@ -158,10 +158,6 @@ border-bottom:2px solid #e2e8f0;
 padding-bottom:20px;
 }
 
-.topbar h2 {
-color:#0f172a;
-}
-
 .top-right{
 display:flex;
 align-items:center;
@@ -185,18 +181,12 @@ border-radius:12px;
 font-weight:500;
 }
 
-.logout-btn:hover{
-transform:translateY(-3px);
-background:#d32f2f;
-}
-
 .menu-grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
 gap:20px;
 }
 
-/* REVISI: Mengembalikan warna asli kotak tombol menu agar kontras gelap di atas background putih */
 .menu-card{
 padding:35px 20px;
 border-radius:22px;
@@ -205,10 +195,10 @@ font-weight:600;
 font-size:17px;
 cursor:pointer;
 transition:.3s;
-background:linear-gradient(135deg, #0b2447, #19376d); /* Gradasi warna gelap original */
-border:1px solid rgba(255, 255, 255, 0.1);
-color:#ffffff; /* Teks putih di dalam tombol gelap */
-box-shadow:0 10px 20px rgba(11, 36, 71, 0.15);
+background:linear-gradient(135deg,#0b2447,#19376d);
+border:1px solid rgba(255,255,255,.1);
+color:#ffffff;
+box-shadow:0 10px 20px rgba(11,36,71,.15);
 display:flex;
 flex-direction:column;
 justify-content:center;
@@ -218,38 +208,17 @@ gap:5px;
 
 .menu-card small{
 font-size:11px;
-color:rgba(255, 255, 255, 0.7); /* Teks deskripsi kecil agak transparan */
-letter-spacing:0.5px;
+color:rgba(255,255,255,.7);
+letter-spacing:.5px;
 text-transform:uppercase;
 font-weight:400;
 }
 
 .menu-card:hover{
 transform:translateY(-7px);
-background:linear-gradient(135deg, #19376d, #254b8c);
-border-color:#d4af37; /* Border emas menyala saat di-hover */
-box-shadow:0 15px 25px rgba(11, 36, 71, 0.3);
-}
-
-/* Kartu khusus untuk materi belajar (Warna Emas Elegan) */
-.pdf-card {
-background: linear-gradient(135deg, #9a7b1c, #b48a04);
-border: 1px solid #ffd700;
-}
-
-.pdf-card span {
-color: #ffffff;
-}
-
-.pdf-card small {
-color: #fff3cd;
-opacity: 0.9;
-}
-
-.pdf-card:hover {
-background: linear-gradient(135deg, #b48a04, #d4af37);
-border-color: #ffffff;
-box-shadow: 0 15px 25px rgba(180, 138, 4, 0.4);
+background:linear-gradient(135deg,#19376d,#254b8c);
+border-color:#d4af37;
+box-shadow:0 15px 25px rgba(11,36,71,.3);
 }
 
 .popup{
@@ -262,18 +231,6 @@ padding:18px 24px;
 border-left:5px solid #2196f3;
 border-radius:14px;
 z-index:9999;
-animation:slide .4s ease;
-}
-
-@keyframes slide{
-from{
-opacity:0;
-transform:translateX(100px);
-}
-to{
-opacity:1;
-transform:translateX(0);
-}
 }
 
 footer{
@@ -285,30 +242,14 @@ border-top:1px solid #e2e8f0;
 margin-top:40px;
 }
 
-@media(max-width:768px){
-
-.login-card{
-padding:30px 20px;
-}
-
-.login-card h1{
-font-size:22px;
-}
-
-.topbar{
-flex-direction:column;
-align-items:flex-start;
-}
-
-}
-
 </style>
 </head>
+
 <body>
 
 <div id="loadingScreen">
 <div class="loader"></div>
-<h2 style="color: #0f172a;">Loading Tryout System...</h2>
+<h2 style="color:#0f172a;">Loading Tryout System...</h2>
 </div>
 
 <section id="loginPage" class="center-page">
@@ -337,7 +278,7 @@ LOGIN
 
 <div>
 <h2>TRYOUT MENU – PAKET REGULER</h2>
-<p id="welcomeText" style="color: #475569; margin-top: 4px;"></p>
+<p id="welcomeText" style="color:#475569;margin-top:4px;"></p>
 </div>
 
 <div class="top-right">
@@ -356,42 +297,24 @@ Logout
 
 <div class="menu-grid">
 
-<div class="menu-card pdf-card" data-link="Materi_Lengkap_Biner.pdf">
-    <span>📖 BUKU SAKU BINER</span>
-    <small>Materi & Teori Dasar</small>
+<div class="menu-card" data-link="words_studikasus_1.html">
+<span>MS WORDS</span>
+<small>Advanced & Tata Naskah</small>
 </div>
 
-<div class="menu-card" data-link="words_studikasus_1.html">
-    <span>MS WORDS</span>
-    <small>Advanced & Tata Naskah</small>
-</div>
 <div class="menu-card" data-link="excel_studikasus_1.html">
-    <span>MS EXCEL SERI 1</span>
-    <small>Antarmuka & Statistik Dasar</small>
+<span>MS EXCEL</span>
+<small>Antarmuka & Statistik Dasar</small>
 </div>
-<div class="menu-card" data-link="excel_studikasus_2.html">
-    <span>MS EXCEL SERI 2</span>
-    <small>String, Logika & Optimasi</small>
-</div>
+
 <div class="menu-card" data-link="ppt_studikasus_1.html">
-    <span>POWER POINT SERI 1</span>
-    <small>Administrasi Paparan & Master</small>
+<span>POWER POINT</span>
+<small>Administrasi Paparan</small>
 </div>
-<div class="menu-card" data-link="ppt_studikasus_2.html">
-    <span>POWER POINT SERI 2</span>
-    <small>Visual Data & Multimedia</small>
-</div>
-<div class="menu-card" data-link="intenet_studikasus_1.html">
-    <span>INTERNET & NETWORK</span>
-    <small>Infrastruktur & Ops Digital</small>
-</div>
+
 <div class="menu-card" data-link="uji_komputer_1.html">
-    <span>UJI KOMPUTER MIX</span>
-    <small>Infrastruktur & Ops Digital</small>
-</div>
-<div class="menu-card" data-link="biner_1.html">
-    <span>SISTEM BINER</span>
-    <small>Paket Khusus Biner</small>
+<span>UJI KOMPUTER MIX</span>
+<small>Simulasi CAT</small>
 </div>
 
 </div>
@@ -404,47 +327,79 @@ Logout
 © PERSONA RESEARCH & CONSULTING
 </footer>
 
-<script>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+get,
+set,
+update
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 //////////////////////////////////////////////////
-// PASSWORD LIST (50 Password dengan Awalan PRC)
+// FIREBASE CONFIG
+//////////////////////////////////////////////////
+
+const firebaseConfig = {
+
+apiKey: "ISI_APIKEY",
+authDomain: "ISI_AUTHDOMAIN",
+databaseURL: "ISI_DATABASE_URL",
+projectId: "ISI_PROJECT_ID",
+storageBucket: "ISI_STORAGE_BUCKET",
+messagingSenderId: "ISI_SENDER_ID",
+appId: "ISI_APP_ID"
+
+};
+
+//////////////////////////////////////////////////
+// FIREBASE INIT
+//////////////////////////////////////////////////
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+//////////////////////////////////////////////////
+// PASSWORD LIST
 //////////////////////////////////////////////////
 
 const passwordList = [
-"PRC92KF", "PRC51QM", "PRC38XL", "PRC74ZN", "PRC16RT", "PRC83XB", "PRC29VL", "PRC64PT", "PRC71KY", "PRC55NF",
-"PRC42QD", "PRC38MR", "PRC74XH", "PRC61PJ", "PRC27LW", "PRC84TC", "PRC53KN", "PRC19XU", "PRC67RE", "PRC41VV",
-"PRC88MG", "PRC25QS", "PRC73NK", "PRC90LV", "PRC36XI", "PRC52PO", "PR7KA", "PRC99QB", "PRC44LC", "PRC88ND",
-"PRC22XE", "PRC66RF", "PRC11PG", "PRC55VH", "PRC77MJ", "PRC33TK", "PRC99XL", "PRC44KM", "PRC88QN", "PRC22LP",
-"PRC66NQ", "PRC11XR", "PRC55RS", "PRC77PT", "PRC33UV", "PRC99VM", "PRC44WT", "PRC88XK", "PRC22YQ", "PRC66ZL"
+
+"PRC92KF", "PRC51QM", "PRC38XL", "PRC74ZN", "PRC16RT",
+"PRC83XB", "PRC29VL", "PRC64PT", "PRC71KY", "PRC55NF",
+"PRC42QD", "PRC38MR", "PRC74XH", "PRC61PJ", "PRC27LW",
+"PRC84TC", "PRC53KN", "PRC19XU", "PRC67RE", "PRC41VV",
+"PRC88MG", "PRC25QS", "PRC73NK", "PRC90LV", "PRC36XI",
+"PRC52PO", "PR7KA", "PRC99QB", "PRC44LC", "PRC88ND",
+"PRC22XE", "PRC66RF", "PRC11PG", "PRC55VH", "PRC77MJ",
+"PRC33TK", "PRC99XL", "PRC44KM", "PRC88QN", "PRC22LP",
+"PRC66NQ", "PRC11XR", "PRC55RS", "PRC77PT", "PRC33UV",
+"PRC99VM", "PRC44WT", "PRC88XK", "PRC22YQ", "PRC66ZL"
+
 ];
 
-let accountData =
-JSON.parse(localStorage.getItem("accountData")) || {};
+//////////////////////////////////////////////////
+// ELEMENT
+//////////////////////////////////////////////////
 
-const loginBtn =
-document.getElementById("loginBtn");
+const loginBtn = document.getElementById("loginBtn");
+const passwordInput = document.getElementById("passwordInput");
+const loginPage = document.getElementById("loginPage");
+const dashboard = document.getElementById("dashboard");
+const popup = document.getElementById("popup");
+const welcomeText = document.getElementById("welcomeText");
+const countdown = document.getElementById("countdown");
 
-const passwordInput =
-document.getElementById("passwordInput");
+//////////////////////////////////////////////////
+// LOADING
+//////////////////////////////////////////////////
 
-const loginPage =
-document.getElementById("loginPage");
+window.onload = ()=>{
 
-const dashboard =
-document.getElementById("dashboard");
-
-const popup =
-document.getElementById("popup");
-
-const welcomeText =
-document.getElementById("welcomeText");
-
-const countdown =
-document.getElementById("countdown");
-
-window.onload = () => {
-
-setTimeout(() => {
+setTimeout(()=>{
 
 document.getElementById("loadingScreen")
 .style.display = "none";
@@ -454,7 +409,7 @@ document.getElementById("loadingScreen")
 };
 
 //////////////////////////////////////////////////
-// DEVICE LOCK FINGERPRINT
+// DEVICE FINGERPRINT
 //////////////////////////////////////////////////
 
 function getDeviceId(){
@@ -474,9 +429,7 @@ Intl.DateTimeFormat()
 .resolvedOptions()
 .timeZone,
 
-navigator.hardwareConcurrency || "cpu",
-
-navigator.maxTouchPoints || "touch"
+navigator.hardwareConcurrency || "cpu"
 
 ].join("###");
 
@@ -502,13 +455,17 @@ return "PRC-" + Math.abs(hash);
 
 }
 
+//////////////////////////////////////////////////
+// POPUP
+//////////////////////////////////////////////////
+
 function showPopup(text){
 
 popup.innerText = text;
 
 popup.classList.remove("hidden");
 
-setTimeout(() => {
+setTimeout(()=>{
 
 popup.classList.add("hidden");
 
@@ -516,56 +473,100 @@ popup.classList.add("hidden");
 
 }
 
+//////////////////////////////////////////////////
+// LOGIN SYSTEM
+//////////////////////////////////////////////////
+
 loginBtn.addEventListener("click", loginSystem);
 
-function loginSystem(){
+async function loginSystem(){
 
 const input = passwordInput.value.trim();
 
 if(!passwordList.includes(input)){
 
 showPopup("Password salah.");
-
 return;
 
 }
 
 const deviceId = getDeviceId();
 
-if(!accountData[input]){
+const userRef =
+ref(db, "accounts/" + input);
 
-accountData[input] = {
+const snapshot =
+await get(userRef);
 
-deviceId:deviceId,
-firstLogin:Date.now()
+//////////////////////////////////////////////////
+// FIRST LOGIN
+//////////////////////////////////////////////////
 
-};
+if(!snapshot.exists()){
 
-saveData();
+await set(userRef, {
 
-}
+deviceId: deviceId,
+firstLogin: Date.now(),
+lastLogin: Date.now()
 
-if(accountData[input].deviceId !== deviceId){
+});
 
-showPopup("Password sudah digunakan di perangkat lain.");
+localStorage.setItem(
+"loggedInUser",
+input
+);
+
+showPopup("Login berhasil.");
+
+openDashboard(input);
 
 return;
 
 }
 
+//////////////////////////////////////////////////
+// VALIDASI DEVICE
+//////////////////////////////////////////////////
+
+const data = snapshot.val();
+
+if(data.deviceId !== deviceId){
+
+showPopup("Password sudah dipakai di device lain.");
+return;
+
+}
+
+//////////////////////////////////////////////////
+// EXPIRED CHECK
+//////////////////////////////////////////////////
+
 const expired =
-accountData[input].firstLogin +
+data.firstLogin +
 (30 * 24 * 60 * 60 * 1000);
 
 if(Date.now() > expired){
 
-showPopup("Masa aktif akun telah habis.");
-
+showPopup("Masa aktif habis.");
 return;
 
 }
 
-localStorage.setItem("loggedInUser",input);
+//////////////////////////////////////////////////
+// UPDATE LOGIN
+//////////////////////////////////////////////////
+
+await update(userRef, {
+
+lastLogin: Date.now()
+
+});
+
+localStorage.setItem(
+"loggedInUser",
+input
+);
 
 showPopup("Login berhasil.");
 
@@ -573,14 +574,9 @@ openDashboard(input);
 
 }
 
-function saveData(){
-
-localStorage.setItem(
-"accountData",
-JSON.stringify(accountData)
-);
-
-}
+//////////////////////////////////////////////////
+// DASHBOARD
+//////////////////////////////////////////////////
 
 function openDashboard(user){
 
@@ -595,11 +591,23 @@ startCountdown(user);
 
 }
 
-function startCountdown(user){
+//////////////////////////////////////////////////
+// COUNTDOWN
+//////////////////////////////////////////////////
 
-setInterval(()=>{
+async function startCountdown(user){
 
-const data = accountData[user];
+setInterval(async()=>{
+
+const userRef =
+ref(db, "accounts/" + user);
+
+const snapshot =
+await get(userRef);
+
+if(!snapshot.exists()) return;
+
+const data = snapshot.val();
 
 const end =
 data.firstLogin +
@@ -610,7 +618,6 @@ const diff = end - Date.now();
 if(diff <= 0){
 
 countdown.innerText = "Expired";
-
 return;
 
 }
@@ -631,26 +638,22 @@ countdown.innerText =
 
 }
 
+//////////////////////////////////////////////////
+// AUTO LOGIN
+//////////////////////////////////////////////////
+
 const loggedUser =
 localStorage.getItem("loggedInUser");
 
 if(loggedUser){
 
-if(accountData[loggedUser]){
-
-const end =
-accountData[loggedUser].firstLogin +
-(30*24*60*60*1000);
-
-if(Date.now() < end){
-
 openDashboard(loggedUser);
 
 }
 
-}
-
-}
+//////////////////////////////////////////////////
+// LOGOUT
+//////////////////////////////////////////////////
 
 document.getElementById("logoutBtn")
 .addEventListener("click",()=>{
@@ -661,7 +664,10 @@ location.reload();
 
 });
 
-// Proteksi anti-copy & klik kanan
+//////////////////////////////////////////////////
+// ANTI INSPECT
+//////////////////////////////////////////////////
+
 document.addEventListener("contextmenu",e=>{
 e.preventDefault();
 });
@@ -682,7 +688,10 @@ e.preventDefault();
 
 });
 
-// Navigasi menu klik
+//////////////////////////////////////////////////
+// MENU NAVIGATION
+//////////////////////////////////////////////////
+
 document.querySelectorAll(".menu-card")
 .forEach(card=>{
 
