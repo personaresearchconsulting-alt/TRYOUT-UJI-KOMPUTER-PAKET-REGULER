@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TRYOUT SIMULASI CAT UJI KOMPUTER</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#f1f5f9; /* Latar belakang utama putih abu-abu terang yang bersih */
+min-height:100vh;
+overflow-x:hidden;
+color:#0f172a;
+}
+
+.hidden{
+display:none !important;
+}
+
+#loadingScreen{
+position:fixed;
+inset:0;
+background:#ffffff;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:99999;
+}
+
+.loader{
+width:70px;
+height:70px;
+border-radius:50%;
+border:6px solid rgba(15,23,42,.1);
+border-top:6px solid #0f172a;
+animation:spin 1s linear infinite;
+margin-bottom:20px;
+}
+
+@keyframes spin{
+100%{
+transform:rotate(360deg);
+}
+}
+
+.center-page{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+
+.glass{
+background:#ffffff;
+border:1px solid #cbd5e1;
+box-shadow:0 10px 25px -5px rgba(0,0,0,.1);
+}
+
+.login-card{
+width:100%;
+max-width:450px;
+padding:40px;
+border-radius:25px;
+text-align:center;
+animation:fade .8s ease;
+}
+
+@keyframes fade{
+from{
+opacity:0;
+transform:translateY(30px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+.login-card h1{
+font-size:28px;
+margin-bottom:12px;
+color:#0f172a;
+}
+
+.subtitle{
+opacity:.8;
+margin-bottom:30px;
+color:#475569;
+}
+
+input{
+width:100%;
+padding:15px;
+border:1px solid #cbd5e1;
+outline:none;
+border-radius:14px;
+margin-bottom:20px;
+font-size:15px;
+background:#f8fafc;
+color:#0f172a;
+}
+
+input:focus {
+border-color:#2196f3;
+background:#ffffff;
+}
+
+button{
+border:none;
+cursor:pointer;
+transition:.3s;
+}
+
+.login-btn{
+width:100%;
+padding:15px;
+background:#2196f3;
+color:white;
+border-radius:14px;
+font-size:16px;
+font-weight:600;
+}
+
+.login-btn:hover{
+transform:translateY(-4px);
+background:#1e88e5;
+box-shadow:0 4px 12px rgba(33,150,243,.3);
+}
+
+#dashboard{
+padding:30px;
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+margin-bottom:30px;
+border-bottom:2px solid #e2e8f0;
+padding-bottom:20px;
+}
+
+.topbar h2 {
+color:#0f172a;
+}
+
+.top-right{
+display:flex;
+align-items:center;
+gap:15px;
+flex-wrap:wrap;
+}
+
+.count-box{
+padding:15px 20px;
+border-radius:15px;
+background:#cbd5e1;
+color:#0f172a;
+font-weight:600;
+}
+
+.logout-btn{
+padding:14px 20px;
+background:#f44336;
+color:white;
+border-radius:12px;
+font-weight:500;
+}
+
+.logout-btn:hover{
+transform:translateY(-3px);
+background:#d32f2f;
+}
+
+.menu-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:20px;
+}
+
+/* REVISI: Mengembalikan warna asli kotak tombol menu agar kontras gelap di atas background putih */
+.menu-card{
+padding:35px 20px;
+border-radius:22px;
+text-align:center;
+font-weight:600;
+font-size:17px;
+cursor:pointer;
+transition:.3s;
+background:linear-gradient(135deg, #0b2447, #19376d); /* Gradasi warna gelap original */
+border:1px solid rgba(255, 255, 255, 0.1);
+color:#ffffff; /* Teks putih di dalam tombol gelap */
+box-shadow:0 10px 20px rgba(11, 36, 71, 0.15);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+gap:5px;
+}
+
+.menu-card small{
+font-size:11px;
+color:rgba(255, 255, 255, 0.7); /* Teks deskripsi kecil agak transparan */
+letter-spacing:0.5px;
+text-transform:uppercase;
+font-weight:400;
+}
+
+.menu-card:hover{
+transform:translateY(-7px);
+background:linear-gradient(135deg, #19376d, #254b8c);
+border-color:#d4af37; /* Border emas menyala saat di-hover */
+box-shadow:0 15px 25px rgba(11, 36, 71, 0.3);
+}
+
+/* Kartu khusus untuk materi belajar (Warna Emas Elegan) */
+.pdf-card {
+background: linear-gradient(135deg, #9a7b1c, #b48a04);
+border: 1px solid #ffd700;
+}
+
+.pdf-card span {
+color: #ffffff;
+}
+
+.pdf-card small {
+color: #fff3cd;
+opacity: 0.9;
+}
+
+.pdf-card:hover {
+background: linear-gradient(135deg, #b48a04, #d4af37);
+border-color: #ffffff;
+box-shadow: 0 15px 25px rgba(180, 138, 4, 0.4);
+}
+
+.popup{
+position:fixed;
+top:30px;
+right:30px;
+background:#0f172a;
+color:white;
+padding:18px 24px;
+border-left:5px solid #2196f3;
+border-radius:14px;
+z-index:9999;
+animation:slide .4s ease;
+}
+
+@keyframes slide{
+from{
+opacity:0;
+transform:translateX(100px);
+}
+to{
+opacity:1;
+transform:translateX(0);
+}
+}
+
+footer{
+text-align:center;
+padding:40px 30px;
+color:#64748b;
+font-size:14px;
+border-top:1px solid #e2e8f0;
+margin-top:40px;
+}
+
+@media(max-width:768px){
+
+.login-card{
+padding:30px 20px;
+}
+
+.login-card h1{
+font-size:22px;
+}
+
+.topbar{
+flex-direction:column;
+align-items:flex-start;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div id="loadingScreen">
+<div class="loader"></div>
+<h2 style="color: #0f172a;">Loading Tryout System...</h2>
+</div>
+
+<section id="loginPage" class="center-page">
+
+<div class="glass login-card">
+
+<h1>TRYOUT SIMULASI CAT UJI KOMPUTER</h1>
+
+<p class="subtitle">
+PERSONA RESEARCH & CONSULTING
+</p>
+
+<input type="password" id="passwordInput" placeholder="Masukkan Password">
+
+<button class="login-btn" id="loginBtn">
+LOGIN
+</button>
+
+</div>
+
+</section>
+
+<section id="dashboard" class="hidden">
+
+<div class="topbar">
+
+<div>
+<h2>TRYOUT MENU – PAKET REGULER</h2>
+<p id="welcomeText" style="color: #475569; margin-top: 4px;"></p>
+</div>
+
+<div class="top-right">
+
+<div class="count-box" id="countdown">
+Loading...
+</div>
+
+<button class="logout-btn" id="logoutBtn">
+Logout
+</button>
+
+</div>
+
+</div>
+
+<div class="menu-grid">
+
+<div class="menu-card pdf-card" data-link="Materi_Lengkap_Biner.pdf">
+    <span>📖 BUKU SAKU BINER</span>
+    <small>Materi & Teori Dasar</small>
+</div>
+
+<div class="menu-card" data-link="words_studikasus_1.html">
+    <span>MS WORDS</span>
+    <small>Advanced & Tata Naskah</small>
+</div>
+<div class="menu-card" data-link="excel_studikasus_1.html">
+    <span>MS EXCEL SERI 1</span>
+    <small>Antarmuka & Statistik Dasar</small>
+</div>
+<div class="menu-card" data-link="excel_studikasus_2.html">
+    <span>MS EXCEL SERI 2</span>
+    <small>String, Logika & Optimasi</small>
+</div>
+<div class="menu-card" data-link="ppt_studikasus_1.html">
+    <span>POWER POINT SERI 1</span>
+    <small>Administrasi Paparan & Master</small>
+</div>
+<div class="menu-card" data-link="ppt_studikasus_2.html">
+    <span>POWER POINT SERI 2</span>
+    <small>Visual Data & Multimedia</small>
+</div>
+<div class="menu-card" data-link="intenet_studikasus_1.html">
+    <span>INTERNET & NETWORK</span>
+    <small>Infrastruktur & Ops Digital</small>
+</div>
+<div class="menu-card" data-link="uji_komputer_1.html">
+    <span>UJI KOMPUTER MIX</span>
+    <small>Infrastruktur & Ops Digital</small>
+</div>
+<div class="menu-card" data-link="biner_1.html">
+    <span>SISTEM BINER</span>
+    <small>Paket Khusus Biner</small>
+</div>
+
+</div>
+
+</section>
+
+<div id="popup" class="popup hidden"></div>
+
+<footer>
+© PERSONA RESEARCH & CONSULTING
+</footer>
+
+<script>
+
+//////////////////////////////////////////////////
+// PASSWORD LIST (50 Password dengan Awalan PRC)
+//////////////////////////////////////////////////
+
+const passwordList = [
+"PRC92KF", "PRC51QM", "PRC38XL", "PRC74ZN", "PRC16RT", "PRC83XB", "PRC29VL", "PRC64PT", "PRC71KY", "PRC55NF",
+"PRC42QD", "PRC38MR", "PRC74XH", "PRC61PJ", "PRC27LW", "PRC84TC", "PRC53KN", "PRC19XU", "PRC67RE", "PRC41VV",
+"PRC88MG", "PRC25QS", "PRC73NK", "PRC90LV", "PRC36XI", "PRC52PO", "PR7KA", "PRC99QB", "PRC44LC", "PRC88ND",
+"PRC22XE", "PRC66RF", "PRC11PG", "PRC55VH", "PRC77MJ", "PRC33TK", "PRC99XL", "PRC44KM", "PRC88QN", "PRC22LP",
+"PRC66NQ", "PRC11XR", "PRC55RS", "PRC77PT", "PRC33UV", "PRC99VM", "PRC44WT", "PRC88XK", "PRC22YQ", "PRC66ZL"
+];
+
+let accountData =
+JSON.parse(localStorage.getItem("accountData")) || {};
+
+const loginBtn =
+document.getElementById("loginBtn");
+
+const passwordInput =
+document.getElementById("passwordInput");
+
+const loginPage =
+document.getElementById("loginPage");
+
+const dashboard =
+document.getElementById("dashboard");
+
+const popup =
+document.getElementById("popup");
+
+const welcomeText =
+document.getElementById("welcomeText");
+
+const countdown =
+document.getElementById("countdown");
+
+window.onload = () => {
+
+setTimeout(() => {
+
+document.getElementById("loadingScreen")
+.style.display = "none";
+
+},1500);
+
+};
+
+//////////////////////////////////////////////////
+// DEVICE LOCK FINGERPRINT
+//////////////////////////////////////////////////
+
+function getDeviceId(){
+
+const rawData = [
+
+navigator.userAgent,
+navigator.platform,
+navigator.language,
+
+screen.width,
+screen.height,
+
+window.devicePixelRatio,
+
+Intl.DateTimeFormat()
+.resolvedOptions()
+.timeZone,
+
+navigator.hardwareConcurrency || "cpu",
+
+navigator.maxTouchPoints || "touch"
+
+].join("###");
+
+return generateHash(rawData);
+
+}
+
+function generateHash(str){
+
+let hash = 0;
+
+for(let i = 0; i < str.length; i++){
+
+hash =
+((hash << 5) - hash)
++ str.charCodeAt(i);
+
+hash |= 0;
+
+}
+
+return "PRC-" + Math.abs(hash);
+
+}
+
+function showPopup(text){
+
+popup.innerText = text;
+
+popup.classList.remove("hidden");
+
+setTimeout(() => {
+
+popup.classList.add("hidden");
+
+},3000);
+
+}
+
+loginBtn.addEventListener("click", loginSystem);
+
+function loginSystem(){
+
+const input = passwordInput.value.trim();
+
+if(!passwordList.includes(input)){
+
+showPopup("Password salah.");
+
+return;
+
+}
+
+const deviceId = getDeviceId();
+
+if(!accountData[input]){
+
+accountData[input] = {
+
+deviceId:deviceId,
+firstLogin:Date.now()
+
+};
+
+saveData();
+
+}
+
+if(accountData[input].deviceId !== deviceId){
+
+showPopup("Password sudah digunakan di perangkat lain.");
+
+return;
+
+}
+
+const expired =
+accountData[input].firstLogin +
+(30 * 24 * 60 * 60 * 1000);
+
+if(Date.now() > expired){
+
+showPopup("Masa aktif akun telah habis.");
+
+return;
+
+}
+
+localStorage.setItem("loggedInUser",input);
+
+showPopup("Login berhasil.");
+
+openDashboard(input);
+
+}
+
+function saveData(){
+
+localStorage.setItem(
+"accountData",
+JSON.stringify(accountData)
+);
+
+}
+
+function openDashboard(user){
+
+loginPage.classList.add("hidden");
+
+dashboard.classList.remove("hidden");
+
+welcomeText.innerHTML =
+`Login sebagai: <b>${user}</b>`;
+
+startCountdown(user);
+
+}
+
+function startCountdown(user){
+
+setInterval(()=>{
+
+const data = accountData[user];
+
+const end =
+data.firstLogin +
+(30 * 24 * 60 * 60 * 1000);
+
+const diff = end - Date.now();
+
+if(diff <= 0){
+
+countdown.innerText = "Expired";
+
+return;
+
+}
+
+const days =
+Math.floor(diff / (1000*60*60*24));
+
+const hours =
+Math.floor((diff/(1000*60*60))%24);
+
+const minutes =
+Math.floor((diff/(1000*60))%60);
+
+countdown.innerText =
+`${days}H ${hours}J ${minutes}M`;
+
+},1000);
+
+}
+
+const loggedUser =
+localStorage.getItem("loggedInUser");
+
+if(loggedUser){
+
+if(accountData[loggedUser]){
+
+const end =
+accountData[loggedUser].firstLogin +
+(30*24*60*60*1000);
+
+if(Date.now() < end){
+
+openDashboard(loggedUser);
+
+}
+
+}
+
+}
+
+document.getElementById("logoutBtn")
+.addEventListener("click",()=>{
+
+localStorage.removeItem("loggedInUser");
+
+location.reload();
+
+});
+
+// Proteksi anti-copy & klik kanan
+document.addEventListener("contextmenu",e=>{
+e.preventDefault();
+});
+
+document.addEventListener("keydown",(e)=>{
+
+if(e.key==="F12"){
+e.preventDefault();
+}
+
+if(e.ctrlKey && e.shiftKey && e.key==="I"){
+e.preventDefault();
+}
+
+if(e.ctrlKey && e.key==="u"){
+e.preventDefault();
+}
+
+});
+
+// Navigasi menu klik
+document.querySelectorAll(".menu-card")
+.forEach(card=>{
+
+card.addEventListener("click",()=>{
+
+const target =
+card.getAttribute("data-link");
+
+window.location.href = target;
+
+});
+
+});
+
+</script>
+
+</body>
+</html>
