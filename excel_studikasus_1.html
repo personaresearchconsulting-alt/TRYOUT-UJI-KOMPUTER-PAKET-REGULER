@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMULASI EXCEL SERI 1 - Persona Research & Consulting</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root { --gold: #D4AF37; --ivory: #FFFFF0; --black: #000000; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--ivory); color: var(--black); margin: 0; padding: 10px; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; user-select: none; -webkit-user-select: none; }
+        .container { max-width: 900px; background: white; margin: auto; padding: 25px; border-radius: 10px; border-top: 8px solid var(--black); box-shadow: 0 4px 20px rgba(0,0,0,0.15); flex: 1; display: flex; flex-direction: column; }
+        .header { text-align: center; border-bottom: 3px double var(--gold); margin-bottom: 20px; padding-bottom: 15px; }
+        .header h2 { margin: 0; font-size: 1.4em; font-weight: 900; text-transform: uppercase; color: var(--black); letter-spacing: 1px; }
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        /* REVISI: Perlebar kotak login dan optimasi padding agar tulisan tidak bertumpuk */
+        .login-box { background: white; padding: 50px 60px; border-radius: 15px; text-align: center; border-top: 8px solid var(--gold); width: 95%; max-width: 750px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .login-box h2 { font-size: 1.8em; margin-bottom: 10px; white-space: nowrap; }
+        .login-box input { width: 100%; padding: 18px; margin: 25px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 1.2em; text-align: center; font-weight: bold; }
+        .q-wrapper { display: none; width: 100%; }
+        .q-wrapper.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .q-text { color: #1a1a1a; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; border-left: 5px solid var(--gold); padding-left: 15px; text-align: justify; }
+        .options { display: grid; gap: 10px; }
+        .options label { display: flex; align-items: center; padding: 15px; background: #f9f9f9; border: 1.5px solid #eee; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .options label:hover { background: #fffcf0; border-color: var(--gold); }
+        .options input { margin-right: 15px; transform: scale(1.4); accent-color: var(--black); }
+        .nav-footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; }
+        .nav-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-bottom: 20px; }
+        .nav-grid button { padding: 8px 0; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 5px; }
+        .nav-grid button.done { background: var(--black); color: white; }
+        .nav-grid button.current { border: 2px solid var(--gold); font-weight: bold; }
+        .btn-action { background: var(--black); color: white; border: none; padding: 18px 40px; font-weight: bold; cursor: pointer; border-radius: 8px; text-transform: uppercase; transition: 0.3s; font-size: 1.1em; }
+        .btn-action:hover { background: var(--gold); }
+        #result-area { display: none; text-align: center; }
+        .score-val { font-size: 5em; font-weight: 900; color: var(--black); }
+        .rekap-table { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 0.85em; text-align: left; }
+        .rekap-table th, .rekap-table td { border: 1px solid #ddd; padding: 12px; }
+        .status-benar { color: green; font-weight: bold; }
+        .status-salah { color: red; font-weight: bold; }
+        .page-footer { text-align: center; padding: 20px; font-size: 0.9em; color: var(--black); font-weight: bold; }
+    </style>
+</head>
+<body oncontextmenu="return false" oncopy="return false" oncut="return false" onkeydown="return (event.keyCode != 123)">
+
+<div id="login-overlay">
+    <div class="login-box">
+        <h2 style="margin:0;">PERSONA RESEARCH & CONSULTING</h2>
+        <h3 style="color: var(--gold); margin-top:10px; letter-spacing: 2px;">SIMULASI TKK EXCEL SERI 1</h3>
+        <p style="font-size: 1.1em;">Fokus: Fondasi Antarmuka, Manajemen Berkas, dan Statistik Dasar Operasional.</p>
+        <input type="text" id="userNameInput" placeholder="MASUKKAN NAMA LENGKAP PESERTA..." autocomplete="off">
+        <button class="btn-action" onclick="startQuiz()">MULAI SIMULASI SEKARANG</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h2>PERSONA RESEARCH & CONSULTING</h2>
+        <small style="color: var(--gold); font-weight: bold; letter-spacing: 1px;">MODUL: EXCEL FOUNDATION & STATISTICS (SERI 1)</small>
+    </div>
+
+    <form id="quizForm">
+        <div id="soalContainer"></div>
+        <div id="result-area">
+            <h3 id="displayUserName" style="color:var(--gold);"></h3>
+            <h2>SKOR AKHIR ANDA</h2>
+            <div class="score-val" id="scoreText">0</div>
+            <button type="button" class="btn-action" onclick="downloadPDF()">UNDUH HASIL DAN PEMBAHASAN (PDF)</button>
+            <div style="overflow-x: auto;">
+                <table class="rekap-table">
+                    <thead><tr><th>No</th><th>Analisis Situasi & Pembahasan</th><th>Status</th></tr></thead>
+                    <tbody id="rekapBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+
+    <div class="nav-footer" id="navFooter">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <button class="btn-action" id="prevBtn" onclick="move(-1)" disabled>KEMBALI</button>
+            <button class="btn-action" id="nextBtn" onclick="move(1)">LANJUT</button>
+        </div>
+        <div class="nav-grid" id="gridNav"></div>
+    </div>
+</div>
+
+<footer class="page-footer">Persona Research & Consulting | Hotline: 0877 4251 5786</footer>
+
+<script>
+    let pesertaName = "";
+    // 50 Soal Seri 1 Excel dengan Pembahasan Lengkap (Tanpa Cite-Cite)
+    let questions = [
+        { q: "Seorang operator perlu mengetahui isi dari sel yang sedang dipilih atau aktif di lembar kerja secara detail. Bagian jendela Excel yang menampilkan informasi isi sel tersebut adalah...", o: ["Formula bar", "Status bar", "Title bar", "Scroll bar"], a: "a", exp: "Formula bar adalah area yang menampilkan isi data atau rumus secara lengkap dari sel yang aktif." },
+        { q: "Dalam laporan bulanan, operator diperintahkan untuk mencari nilai rata-rata dari sekumpulan data angka. Fungsi yang harus digunakan adalah...", o: ["SUM", "MAX", "MIN", "AVERAGE"], a: "d", exp: "Fungsi Average digunakan untuk menghitung nilai rata-rata aritmatika dari rentang sel tertentu." },
+        { q: "Saat sedang bekerja, operator harus melakukan perbaikan data pada sebuah sel. Tombol keyboard yang paling cepat digunakan untuk masuk ke mode edit sel adalah...", o: ["F1", "F2", "F3", "F4"], a: "b", exp: "Tombol F2 secara otomatis menempatkan kursor di dalam sel aktif untuk memulai pengeditan." },
+        { q: "Operator ingin mengakhiri atau menutup aplikasi Microsoft Excel secara permanen. Kombinasi tombol keyboard yang digunakan adalah...", o: ["Alt + F4", "Ctrl + F4", "Alt + F2", "Ctrl + F2"], a: "a", exp: "Alt + F4 adalah pintasan global Windows untuk menutup jendela aplikasi yang sedang aktif." },
+        { q: "Microsoft Excel merupakan program aplikasi yang masuk ke dalam kategori...", o: ["Wordprocessor", "Presentasi", "Animasi", "Spreadsheet"], a: "d", exp: "Spreadsheet adalah istilah untuk perangkat lunak pengolah angka yang disusun dalam kolom dan baris." },
+        { q: "Untuk membatalkan perintah yang baru saja dilakukan karena terjadi kesalahan input, operator menggunakan fitur...", o: ["Undo", "Redo", "Copy", "Paste"], a: "a", exp: "Undo berfungsi untuk membatalkan satu atau beberapa langkah perintah terakhir yang telah dijalankan." },
+        { q: "Dalam sebuah tabel anggaran, operator ingin memberikan garis tepi atau bingkai pada sekumpulan sel. Di kotak dialog Format Cells, menu yang dipilih adalah...", o: ["Number", "Alignment", "Borders", "Fill"], a: "c", exp: "Tab Borders digunakan khusus untuk mengatur jenis, ketebalan, dan warna garis bingkai sel." },
+        { q: "Operator diperintahkan untuk menjumlahkan seluruh nilai dalam satu kolom laporan logistik. Fungsi yang tepat adalah...", o: ["SUM", "MAX", "MIN", "AVERAGE"], a: "a", exp: "Fungsi SUM menjumlahkan nilai numerik dalam rentang sel (range) yang dipilih." },
+        { q: "Agar hasil cetakan tabel yang melebar ke samping tidak terpotong, operator sebaiknya memilih orientasi kertas...", o: ["Landscape", "Portrait", "Tegak", "Bagi dua"], a: "a", exp: "Landscape memosisikan kertas secara mendatar, ideal untuk tabel dengan jumlah kolom yang banyak." },
+        { q: "Bagian jendela Excel yang berfungsi menampilkan nama file atau judul dokumen yang sedang dibuka adalah...", o: ["Title bar", "Menu bar", "Toolbar", "Status bar"], a: "a", exp: "Title bar terletak di bagian paling atas jendela dan memuat nama file yang sedang aktif." },
+        { q: "Operator ingin membuat buku kerja (workbook) baru yang masih kosong. Shortcut keyboard yang digunakan adalah...", o: ["Ctrl + S", "Ctrl + N", "Ctrl + V", "Ctrl + A"], a: "b", exp: "Ctrl + N (New) digunakan untuk membuka workbook kosong baru tanpa menutup file lama." },
+        { q: "Lembar kerja dalam aplikasi Excel dikenal juga dengan istilah...", o: ["Range", "Cell", "Worksheet", "Area slide"], a: "c", exp: "Worksheet adalah halaman kerja tunggal yang terdiri dari grid sel dalam Excel." },
+        { q: "Ikon yang berisi perintah simpan (Save), urungkan (Undo), dan ulangi (Redo) terdapat pada bagian...", o: ["Ribbon", "Office Button", "Status Bar", "Quick Access Toolbar"], a: "d", exp: "Quick Access Toolbar menyediakan akses cepat ke perintah-perintah yang paling sering digunakan." },
+        { q: "Pertemuan antara baris (row) dengan kolom (column) dalam Excel membentuk sebuah...", o: ["Range", "Sheet", "Cell", "Workbook"], a: "c", exp: "Cell atau sel adalah unit terkecil dalam Excel tempat data dimasukkan." },
+        { q: "Kumpulan dari beberapa sel yang membentuk area persegi panjang di lembar kerja disebut...", o: ["Worksheet", "Workbook", "Range", "Pointer"], a: "c", exp: "Range merujuk pada blok sel yang dipilih secara bersamaan dalam bentuk persegi." },
+        { q: "Untuk menyimpan hasil pekerjaan dengan cepat menggunakan keyboard, operator menekan...", o: ["Ctrl + P", "Ctrl + O", "Ctrl + S", "Ctrl + A"], a: "c", exp: "Ctrl + S (Save) secara otomatis memperbarui file yang tersimpan di memori perangkat." },
+        { q: "Operator perlu mengetahui alamat sel yang sedang aktif. Informasi ini dapat dilihat pada bagian jendela Excel yang disebut...", o: ["Bar rumus", "Bar nama", "Bar status", "Bar judul"], a: "b", exp: "Bar Nama atau Name Box menunjukkan koordinat kolom dan baris (misal A1) dari sel yang aktif." },
+        { q: "Pimpinan meminta laporan dicetak saat itu juga. Shortcut keyboard untuk memunculkan menu cetak (Print) adalah...", o: ["Ctrl + V", "Ctrl + C", "Ctrl + Shift + P", "Ctrl + P"], a: "d", exp: "Ctrl + P (Print) membuka panel pengaturan pencetakan dokumen." },
+        { q: "Untuk memformat angka agar muncul lambang mata uang (seperti Rp atau $), kategori yang dipilih di Format Cells adalah...", o: ["Currency", "Percent Style", "Comma Style", "Dollar"], a: "a", exp: "Format Currency menambahkan simbol mata uang dan pemisah ribuan pada nilai angka." },
+        { q: "Sebelum mencetak, operator ingin melihat tampilan halaman di layar untuk memastikan kerapiannya. Fitur ini disebut...", o: ["Print Preview", "Zoom", "Page Layout", "Full Screen"], a: "a", exp: "Print Preview mensimulasikan hasil cetak di layar untuk menghindari pemborosan kertas." },
+        { q: "Operator ingin memperbesar tampilan lembar kerja di layar tanpa mengubah ukuran font asli. Fitur yang diatur adalah...", o: ["Custom View", "Full Screen", "Zoom", "View Sheets"], a: "c", exp: "Zoom mengatur skala tampilan antarmuka tanpa memengaruhi ukuran asli data." },
+        { q: "Untuk memilih seluruh data (select all) yang ada di lembar kerja secara sekaligus, operator menekan...", o: ["Ctrl + S", "Ctrl + P", "Ctrl + B", "Ctrl + A"], a: "d", exp: "Ctrl + A (All) menyeleksi seluruh isi worksheet yang aktif." },
+        { q: "Garis bantu yang memisahkan antar sel secara horizontal dan vertikal di layar kerja disebut...", o: ["Borders", "Gridlines", "Scroll bar", "Toolbar"], a: "b", exp: "Gridlines adalah garis abu-abu tipis yang membantu navigasi visual di lembar kerja." },
+        { q: "Operator ingin menggeser tampilan lembar kerja ke arah kiri atau kanan (horizontal). Bagian yang digunakan adalah...", o: ["Scroll bar vertical", "Scroll bar horizontal", "Status bar", "Menu bar"], a: "b", exp: "Scroll bar horizontal berada di bawah layar untuk menggeser tampilan secara mendatar." },
+        { q: "Untuk menggandakan data dari satu sel ke sel lain, urutan perintah yang benar adalah...", o: ["Cut dan Paste", "Copy dan Paste", "Copy dan Cut", "Select all dan Copy"], a: "b", exp: "Copy menyalin data ke clipboard, dan Paste menempelkannya ke lokasi tujuan." },
+        { q: "Fungsi statistik yang digunakan untuk mencari nilai tertinggi dalam suatu rentang data adalah...", o: ["SUM", "MAX", "MIN", "AVERAGE"], a: "b", exp: "Fungsi MAX membandingkan semua angka dalam range dan menampilkan yang paling besar." },
+        { q: "Fungsi statistik yang digunakan untuk mencari nilai terendah dalam suatu rentang data adalah...", o: ["SUM", "MAX", "MIN", "AVERAGE"], a: "c", exp: "Fungsi MIN membandingkan semua angka dalam range dan menampilkan yang paling kecil." },
+        { q: "Operator ingin membuka file Excel yang sudah pernah disimpan sebelumnya. Pintasan keyboard-nya adalah...", o: ["Ctrl + V", "Ctrl + O", "Ctrl + U", "Ctrl + B"], a: "b", exp: "Ctrl + O (Open) memunculkan kotak dialog pencarian file yang tersimpan." },
+        { q: "Dalam Excel, daerah penulisan rumus disebut juga dengan...", o: ["Menu bar", "Title bar", "Formula bar", "Toolbar"], a: "c", exp: "Formula bar adalah bilah panjang di atas worksheet tempat memasukkan atau melihat rumus." },
+        { q: "Ekstensi file standar yang dihasilkan oleh aplikasi Microsoft Excel (versi lama) adalah...", o: [".doc", ".exe", ".ppt", ".xls"], a: "d", exp: ".xls adalah format file Excel biner yang digunakan hingga versi 2003." },
+        { q: "Untuk merubah posisi teks agar menjadi miring (Italic), operator menekan tombol...", o: ["Ctrl + B", "Ctrl + I", "Ctrl + U", "Ctrl + S"], a: "b", exp: "Ctrl + I (Italic) memberikan efek miring pada teks yang dipilih." },
+        { q: "Untuk merubah posisi teks agar menjadi tebal (Bold), operator menggunakan pintasan...", o: ["Ctrl + B", "Ctrl + I", "Ctrl + U", "Ctrl + S"], a: "a", exp: "Ctrl + B (Bold) mempertebal tampilan teks." },
+        { q: "Untuk memberikan garis bawah pada teks (Underline), pintasan yang digunakan adalah...", o: ["Ctrl + B", "Ctrl + I", "Ctrl + U", "Ctrl + S"], a: "c", exp: "Ctrl + U (Underline) menambahkan garis di bawah karakter teks." },
+        { q: "Operator ingin memindahkan data (bukan menggandakan). Urutan perintah yang benar adalah...", o: ["Cut dan Paste", "Copy dan Paste", "Copy dan Cut", "Select all dan Cut"], a: "a", exp: "Cut menghapus data dari lokasi lama dan memindahkannya ke lokasi baru saat dipaste." },
+        { q: "Pimpinan meminta agar kolom tabel diperlebar agar teks tidak tertutup. Menu yang digunakan adalah...", o: ["Insert Sheet", "Borders", "Column Width", "Format Cells"], a: "c", exp: "Column Width memungkinkan pengaturan lebar kolom secara presisi dalam satuan karakter." },
+        { q: "Fungsi yang digunakan untuk menghitung jumlah sel yang berisi data numerik (banyaknya data) adalah...", o: ["COUNT", "SUM", "MAX", "RANK"], a: "a", exp: "COUNT hanya menghitung sel yang memiliki isi berupa angka, bukan teks atau sel kosong." },
+        { q: "Bagian Excel yang digunakan untuk berpindah antar lembar kerja (Sheet1, Sheet2, dst) adalah...", o: ["Scroll bar", "Tab lembaran kerja", "Menu bar", "Formula bar"], a: "b", exp: "Tab lembaran kerja terletak di kiri bawah jendela untuk navigasi antar sheet." },
+        { q: "Untuk menjalankan perintah tertentu melalui klik pada ikon gambar di layar, bagian yang digunakan disebut...", o: ["Menu bar", "Toolbar", "Status bar", "Formula bar"], a: "b", exp: "Toolbar adalah barisan ikon grafis yang merepresentasikan berbagai perintah aplikasi." },
+        { q: "Operator ingin menambahkan baris baru di atas baris yang sedang aktif. Di menu Insert, yang harus dipilih adalah...", o: ["Insert Cells", "Insert Sheet Rows", "Insert Sheet Column", "Insert Sheet"], a: "b", exp: "Insert Sheet Rows menyisipkan baris kosong tepat di atas baris yang disorot." },
+        { q: "Untuk menambahkan kolom baru di sebelah kiri sel aktif, operator memilih...", o: ["Insert Cells", "Insert Sheet Rows", "Insert Sheet Column", "Insert Sheet"], a: "c", exp: "Insert Sheet Column menyisipkan kolom kosong di sisi kiri kolom yang disorot." },
+        { q: "Perintah Page Setup, yang digunakan untuk mengatur margin dan ukuran kertas, terdapat pada menu...", o: ["File", "Insert", "Page Layout", "Format"], a: "c", exp: "Tab Page Layout berisi semua kontrol terkait tata letak halaman dan persiapan cetak." },
+        { q: "Operator ingin memformat angka agar memiliki tanda pemisah ribuan (titik). Hal ini diatur di kotak dialog...", o: ["Options", "Format Cells", "Data Edit", "Page Setup"], a: "b", exp: "Format Cells menyediakan opsi 'Use 1000 Separator' dalam kategori Number." },
+        { q: "Untuk memindahkan sel aktif menggunakan keyboard ke arah bawah, operator menekan...", o: ["Enter", "Tab", "Tombol Arah", "Semua benar"], a: "a", exp: "Tombol Enter secara default memindahkan kursor ke sel tepat di bawahnya." },
+        { q: "Microsoft Excel dirancang khusus sebagai aplikasi untuk pengolahan...", o: ["Kata", "Data angka, tabel, dan grafik", "Presentasi", "Animasi"], a: "b", exp: "Fungsi utama Excel adalah manipulasi data numerik, pengorganisasian tabel, dan visualisasi grafik." },
+        { q: "Dalam Excel standar (versi lama), jumlah maksimal baris yang tersedia dalam satu worksheet adalah...", o: ["65356", "65536", "63536", "65636"], a: "b", exp: "Excel versi 2003 ke bawah memiliki batas 65.536 baris per worksheet." },
+        { q: "Kumpulan sel B5 menunjukkan bahwa sel tersebut berada pada...", o: ["Kolom B baris 5", "Baris B kolom 5", "Halaman B lembar 5", "Range B sampai 5"], a: "a", exp: "Alamat sel Excel dimulai dengan huruf kolom diikuti nomor baris." },
+        { q: "Untuk mengganti nama (Rename) pada tab lembar kerja, operator harus...", o: ["Klik kanan pada tab sheet", "Tekan Ctrl+S", "Tekan F2", "Klik Menu File"], a: "a", exp: "Opsi Rename tersedia dalam menu konteks yang muncul saat klik kanan pada nama sheet." },
+        { q: "Menu yang digunakan untuk melihat daftar rumus yang tersedia di Excel adalah...", o: ["Insert", "Formulas", "Tools", "Data"], a: "b", exp: "Tab Formulas adalah pusat perpustakaan fungsi yang terbagi berdasarkan kategori (Logika, Teks, dll)." },
+        { q: "Operator ingin mengatur tinggi baris tabel agar seragam. Menu yang digunakan adalah...", o: ["Format Row Height", "Format Column Width", "Insert Row", "Page Setup"], a: "a", exp: "Row Height menentukan jarak vertikal antar garis baris dalam satuan poin." },
+        { q: "Shortcut keyboard untuk melakukan perintah 'Paste' setelah data di-copy adalah...", o: ["Ctrl + C", "Ctrl + X", "Ctrl + V", "Ctrl + P"], a: "c", exp: "Ctrl + V menempelkan isi data terakhir yang tersimpan di clipboard." }
+    ];
+
+    function shuffleOptions() {
+        questions.forEach(q => {
+            const correctText = q.o[q.a.charCodeAt(0) - 97];
+            q.o.sort(() => Math.random() - 0.5);
+            q.a = String.fromCharCode(97 + q.o.indexOf(correctText));
+        });
+    }
+
+    let currentIdx = 0;
+    const expiredDate = "2028-07-01";
+
+    function startQuiz() {
+        const today = new Date().toISOString().split('T')[0];
+        if (today > expiredDate) { alert("Masa berlaku link telah berakhir."); return; }
+        const name = document.getElementById('userNameInput').value.trim();
+        if (!name) { alert("Masukkan Nama Lengkap!"); return; }
+        pesertaName = name;
+        document.getElementById('login-overlay').style.display = 'none';
+        shuffleOptions();
+        initQuiz();
+    }
+
+    function initQuiz() {
+        const container = document.getElementById('soalContainer');
+        const grid = document.getElementById('gridNav');
+        container.innerHTML = "";
+        grid.innerHTML = "";
+        questions.forEach((s, i) => {
+            const div = document.createElement('div');
+            div.className = 'q-wrapper';
+            div.id = `q${i}`;
+            let opts = s.o.map((opt, idx) => {
+                const char = String.fromCharCode(97 + idx);
+                return `<label><input type="radio" name="ans${i}" value="${char}" onchange="hAns(${i})"> ${char.toUpperCase()}. ${opt}</label>`;
+            }).join('');
+            div.innerHTML = `<div class="q-text">${i+1}. ${s.q}</div><div class="options">${opts}</div>`;
+            container.appendChild(div);
+
+            const btn = document.createElement('button');
+            btn.id = `nav${i}`; btn.innerText = i + 1;
+            btn.onclick = () => jump(i);
+            grid.appendChild(btn);
+        });
+        showSoal(0);
+    }
+
+    function hAns(idx) {
+        document.getElementById(`nav${idx}`).classList.add('done');
+        if (currentIdx < questions.length - 1) setTimeout(() => { move(1); }, 400);
+    }
+
+    function showSoal(idx) {
+        document.querySelectorAll('.q-wrapper').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById(`q${idx}`);
+        if(target) target.classList.add('active');
+        
+        document.querySelectorAll('.nav-grid button').forEach(el => el.classList.remove('current'));
+        const navBtn = document.getElementById(`nav${idx}`);
+        if(navBtn) navBtn.classList.add('current');
+        
+        document.getElementById('prevBtn').disabled = (idx === 0);
+        document.getElementById('nextBtn').innerText = (idx === questions.length - 1) ? "SELESAI" : "LANJUT";
+        currentIdx = idx;
+    }
+
+    function move(step) {
+        if (currentIdx === questions.length - 1 && step === 1) { finishQuiz(); return; }
+        showSoal(currentIdx + step);
+    }
+
+    function jump(idx) { showSoal(idx); }
+
+    function finishQuiz() {
+        if (!confirm("Akhiri simulasi Seri 1 sekarang?")) return;
+        let sc = 0;
+        const b = document.getElementById('rekapBody');
+        b.innerHTML = "";
+        questions.forEach((s, i) => {
+            const sel = document.querySelector(`input[name="ans${i}"]:checked`);
+            const u = sel ? sel.value : null;
+            const isC = (u === s.a); if (isC) sc++;
+            const uT = u ? s.o[u.charCodeAt(0) - 97] : "-";
+            const cT = s.o[s.a.charCodeAt(0) - 97];
+            const r = b.insertRow();
+            r.innerHTML = `<td>${i+1}</td><td><strong>SITUASI:</strong> ${s.q}<br><small>Jawaban Anda: (${u?u.toUpperCase():'-'}) ${uT} | Kunci: (${s.a.toUpperCase()}) ${cT}<br><strong>PEMBAHASAN:</strong> ${s.exp}</small></td><td class="${isC?'status-benar':'status-salah'}">${isC?'BENAR':'SALAH'}</td>`;
+        });
+        const fS = (sc / questions.length) * 100;
+        document.getElementById('scoreText').innerText = fS.toFixed(0);
+        document.getElementById('displayUserName').innerText = pesertaName.toUpperCase();
+        document.getElementById('soalContainer').style.display = 'none';
+        document.getElementById('navFooter').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        window.scrollTo(0,0);
+    }
+
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(14);
+        doc.text("BERITA ACARA HASIL SIMULASI TKK EXCEL SERI 1", 105, 15, { align: "center" });
+        doc.setFontSize(12);
+        doc.text("INSTANSI: PERSONA RESEARCH & CONSULTING", 105, 22, { align: "center" });
+        doc.text("__________________________________________________________________", 105, 25, { align: "center" });
+        doc.text("NAMA PESERTA : " + pesertaName.toUpperCase(), 15, 35);
+        doc.text("SKOR AKHIR    : " + document.getElementById('scoreText').innerText, 15, 42);
+        const rs = [];
+        questions.forEach((s, i) => {
+            const sel = document.querySelector(`input[name="ans${i}"]:checked`);
+            const isC = (sel && sel.value === s.a);
+            rs.push([i+1, s.q.substring(0, 80) + "...", isC ? "BENAR" : "SALAH"]);
+        });
+        doc.autoTable({ startY: 50, head: [['No', 'Uraian Situasi', 'Status']], body: rs, theme: 'grid', headStyles: { fillStyle: 'dark', fillColor: [0, 0, 0] } });
+        doc.save(`BA_Hasil_EXCEL_S1_${pesertaName}.pdf`);
+    }
+</script>
+</body>
+</html>

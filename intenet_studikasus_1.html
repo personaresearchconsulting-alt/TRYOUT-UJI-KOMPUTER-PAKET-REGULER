@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMULASI TKK INTERNET - Persona Research & Consulting</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root { --gold: #D4AF37; --ivory: #FFFFF0; --black: #000000; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--ivory); color: var(--black); margin: 0; padding: 10px; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; user-select: none; -webkit-user-select: none; }
+        .container { max-width: 900px; background: white; margin: auto; padding: 25px; border-radius: 10px; border-top: 8px solid var(--black); box-shadow: 0 4px 20px rgba(0,0,0,0.15); flex: 1; display: flex; flex-direction: column; }
+        .header { text-align: center; border-bottom: 3px double var(--gold); margin-bottom: 20px; padding-bottom: 15px; }
+        .header h2 { margin: 0; font-size: 1.4em; font-weight: 900; text-transform: uppercase; color: var(--black); letter-spacing: 1px; }
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-box { background: white; padding: 50px 60px; border-radius: 15px; text-align: center; border-top: 8px solid var(--gold); width: 95%; max-width: 750px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .login-box h2 { font-size: 1.8em; margin-bottom: 10px; white-space: nowrap; }
+        .login-box input { width: 100%; padding: 18px; margin: 25px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 1.2em; text-align: center; font-weight: bold; }
+        .q-wrapper { display: none; width: 100%; }
+        .q-wrapper.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .q-text { color: #1a1a1a; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; border-left: 5px solid var(--gold); padding-left: 15px; text-align: justify; }
+        .options { display: grid; gap: 10px; }
+        .options label { display: flex; align-items: center; padding: 15px; background: #f9f9f9; border: 1.5px solid #eee; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .options label:hover { background: #fffcf0; border-color: var(--gold); }
+        .options input { margin-right: 15px; transform: scale(1.4); accent-color: var(--black); }
+        .nav-footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; }
+        .nav-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-bottom: 20px; }
+        .nav-grid button { padding: 8px 0; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 5px; }
+        .nav-grid button.done { background: var(--black); color: white; }
+        .nav-grid button.current { border: 2px solid var(--gold); font-weight: bold; }
+        .btn-action { background: var(--black); color: white; border: none; padding: 18px 40px; font-weight: bold; cursor: pointer; border-radius: 8px; text-transform: uppercase; transition: 0.3s; font-size: 1.1em; }
+        .btn-action:hover { background: var(--gold); }
+        #result-area { display: none; text-align: center; }
+        .score-val { font-size: 5em; font-weight: 900; color: var(--black); }
+        .rekap-table { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 0.85em; text-align: left; }
+        .rekap-table th, .rekap-table td { border: 1px solid #ddd; padding: 12px; }
+        .status-benar { color: green; font-weight: bold; }
+        .status-salah { color: red; font-weight: bold; }
+        .page-footer { text-align: center; padding: 20px; font-size: 0.9em; color: var(--black); font-weight: bold; }
+    </style>
+</head>
+<body oncontextmenu="return false" oncopy="return false" oncut="return false" onkeydown="return (event.keyCode != 123)">
+
+<div id="login-overlay">
+    <div class="login-box">
+        <h2 style="margin:0;">PERSONA RESEARCH & CONSULTING</h2>
+        <h3 style="color: var(--gold); margin-top:10px; letter-spacing: 2px;">SIMULASI TKK INTERNET & JARINGAN</h3>
+        <p style="font-size: 1.1em;">Analisis Infrastruktur Digital, Komunikasi Taktis, dan Keamanan Jaringan Instansi.</p>
+        <input type="text" id="userNameInput" placeholder="MASUKKAN NAMA LENGKAP PESERTA..." autocomplete="off">
+        <button class="btn-action" onclick="startQuiz()">MULAI SIMULASI DIGITAL</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h2>PERSONA RESEARCH & CONSULTING</h2>
+        <small style="color: var(--gold); font-weight: bold; letter-spacing: 1px;">MODUL: NETWORK INFRASTRUCTURE & DIGITAL OPERATIONS</small>
+    </div>
+
+    <form id="quizForm">
+        <div id="soalContainer"></div>
+        <div id="result-area">
+            <h3 id="displayUserName" style="color:var(--gold);"></h3>
+            <h2>SKOR AKHIR ANDA</h2>
+            <div class="score-val" id="scoreText">0</div>
+            <button type="button" class="btn-action" onclick="downloadPDF()">UNDUH BERITA ACARA (PDF)</button>
+            <div style="overflow-x: auto;">
+                <table class="rekap-table">
+                    <thead><tr><th>No</th><th>Analisis Lapangan & Pembahasan Mendalam</th><th>Status</th></tr></thead>
+                    <tbody id="rekapBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+
+    <div class="nav-footer" id="navFooter">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <button class="btn-action" id="prevBtn" onclick="move(-1)" disabled>KEMBALI</button>
+            <button class="btn-action" id="nextBtn" onclick="move(1)">LANJUT</button>
+        </div>
+        <div class="nav-grid" id="gridNav"></div>
+    </div>
+</div>
+
+<footer class="page-footer">Persona Research & Consulting | Hotline: 0877 425 5786</footer>
+
+<script>
+    let pesertaName = "";
+    let questions = [
+        { q: "Muncul kendala saat melakukan verifikasi data pada draf naskah digital melalui aplikasi browser. Untuk memicu proses pemuatan ulang halaman guna memastikan data terbaru telah tersinkronisasi, tombol navigasi yang ditekan adalah...", o: ["Go", "Back", "Search", "Refresh"], a: "d", exp: "Refresh (atau F5) memerintahkan browser untuk meminta ulang data dari server, sangat penting dilakukan jika halaman web terasa statis atau gagal menampilkan pembaruan data terkini." },
+        { q: "Dalam koordinasi antar-satker, alamat surat elektronik (e-mail) menjadi identitas vital. Struktur alamat e-mail resmi selalu diakhiri dengan komponen yang menunjukkan identitas organisasi atau penyedia layanan, yang disebut...", o: ["Jenis protocol", "Nama domain", "Nama group", "Path"], a: "b", exp: "Nama domain (seperti @gmail.com atau @polri.go.id) adalah bagian akhir e-mail yang menentukan lokasi server tempat kotak surat tersebut terdaftar secara legal di internet." },
+        { q: "Terdapat instruksi untuk melakukan pengambilan file draf laporan tahunan berukuran besar dari server pusat secara cepat. Protokol internet yang dirancang khusus untuk kebutuhan transfer file tersebut adalah...", o: ["WWW", "Milis", "Newsgroup", "FTP"], a: "d", exp: "FTP (File Transfer Protocol) adalah standar komunikasi yang jauh lebih efisien untuk mengunduh atau mengunggah berkas besar dibandingkan melalui protokol web biasa." },
+        { q: "Instalasi modem eksternal pada komputer ruang piket memerlukan koneksi fisik yang stabil. Jenis port yang paling umum digunakan untuk menghubungkan perangkat modem modern ke unit komputer adalah...", o: ["COM1", "COM3", "USB", "Mainboard"], a: "c", exp: "USB (Universal Serial Bus) merupakan standar port universal yang mendukung kecepatan transfer data tinggi dan fitur 'plug-and-play' untuk perangkat komunikasi eksternal." },
+        { q: "Kebutuhan akan keamanan data personel sangat tinggi dalam pemilihan penyedia jasa internet (ISP). Fitur teknis yang bertindak sebagai perantara keamanan dan penyaring lalu lintas data antara jaringan internal dan internet disebut...", o: ["Backbone", "Akses cepat", "Proxy", "Bandwidth"], a: "c", exp: "Server Proxy berfungsi sebagai gerbang pengamanan yang menyembunyikan identitas jaringan lokal dan menyaring konten berbahaya sebelum mencapai komputer operator." },
+        { q: "Terjadi perlambatan akses pada aplikasi pelaporan berbasis web di wilayah tertentu. Secara teknis, kapasitas maksimal jalur komunikasi yang menentukan volume data yang dapat keluar masuk dalam satu waktu disebut...", o: ["Bandwidth", "Backbone", "Telepon", "Byte"], a: "a", exp: "Bandwidth adalah lebar pita atau kapasitas jalur data. Semakin lebar bandwidth, semakin banyak data yang dapat ditransfer per detik, sehingga akses terasa lebih lancar." },
+        { q: "Jaringan utama berskala besar yang menghubungkan titik-titik pusat komunikasi antar-wilayah guna menunjang ketersediaan koneksi nasional sering diistilahkan sebagai...", o: ["Bandwidth", "Backbone", "Gateway", "Intranet"], a: "b", exp: "Backbone (Tulang Punggung) jaringan adalah infrastruktur pusat dengan kapasitas sangat tinggi yang menjadi jalur utama bagi seluruh lalu lintas data antar-jaringan." },
+        { q: "Dalam operasional unit siber, sering ditemukan kebutuhan untuk memantau situasi lapangan melalui kamera yang gambarnya dapat diakses secara langsung melalui jaringan web. Perangkat keras ini dikenal sebagai...", o: ["CCTV", "Webcam", "Monitor", "Televisi"], a: "b", exp: "Webcam yang terintegrasi dengan jaringan memungkinkan transmisi visual secara real-time, baik untuk kebutuhan video call koordinasi maupun pemantauan area secara digital." },
+        { q: "Protokol komunikasi data yang menjadi standar internasional dan wajib dimiliki oleh sistem operasi modern agar komputer dapat saling bertukar informasi secara universal di jaringan internet adalah...", o: ["GPRS", "NWLink", "TCP/IP", "CDMA"], a: "c", exp: "TCP/IP adalah sekumpulan protokol komunikasi yang menjadi bahasa standar internet, memungkinkan ribuan jenis perangkat berbeda untuk saling terhubung tanpa kendala." },
+        { q: "Seorang operator di unit administrasi perlu mengirimkan lampiran berkas fisik yang telah didigitalisasi melalui e-mail. Fitur khusus dalam e-mail untuk menyertakan file tersebut adalah...", o: ["To", "Subject", "Cc", "Attachment"], a: "d", exp: "Attachment (Lampiran) memungkinkan dokumen dalam berbagai format (PDF, Gambar, Word) dikirimkan bersamaan dengan pesan teks e-mail sebagai satu kesatuan paket." },
+        { q: "Muncul kebutuhan untuk melakukan diskusi intensif dalam satu kelompok kerja melalui sarana surat elektronik secara terorganisir. Fasilitas ini dikenal dengan istilah...", o: ["Mailing list (Milis)", "Chatting", "Browsing", "FTP"], a: "a", exp: "Mailing List (Milis) mengotomatisasi pengiriman pesan ke seluruh anggota kelompok, sehingga koordinasi tertulis dapat dilakukan secara massal melalui satu alamat e-mail grup." },
+        { q: "Setiap situs web memiliki identitas unik berupa susunan karakter yang diketikkan pada address bar untuk memanggil alamat situs tersebut. Sistem penamaan alamat internet ini secara teknis disebut...", o: ["URL (Uniform Resource Locator)", "FTP", "HTTP", "HTML"], a: "a", exp: "URL adalah alamat digital lengkap yang menunjukkan lokasi spesifik sebuah sumber daya (seperti halaman web) di dalam luasnya jaringan internet." },
+        { q: "Dalam pemrosesan data naskah dinas, operator menemukan bahwa tampilan web ditulis menggunakan bahasa penanda standar untuk menyusun teks dan elemen visual. Bahasa tersebut adalah...", o: ["CMS", "HTML", "PHP", "FTP"], a: "b", exp: "HTML (Hyper Text Markup Language) adalah kode dasar yang digunakan untuk membangun dan menyusun kerangka halaman web agar dapat diterjemahkan oleh browser secara visual." },
+        { q: "Terjadi situasi di mana proses pemuatan (loading) halaman web rahasia berjalan terlalu lambat atau terindikasi mengalami gangguan keamanan. Tombol untuk membatalkan proses pemuatan tersebut seketika adalah...", o: ["Forward", "Back", "Stop", "Home"], a: "c", exp: "Tombol Stop berfungsi menghentikan aktivitas transmisi data antara browser dan server, berguna untuk menghemat sumber daya atau mencegah pemuatan halaman yang bermasalah." },
+        { q: "Seorang personel ingin melacak kembali alamat situs instruksi yang pernah dikunjungi beberapa jam sebelumnya guna memastikan validitas informasi. Fitur browser yang menyimpan daftar kunjungan tersebut adalah...", o: ["History", "Favorite", "Media", "Back"], a: "a", exp: "History (Riwayat) mencatat seluruh aktivitas penjelajahan berdasarkan waktu, memungkinkan operator menemukan kembali informasi yang pernah diakses tanpa harus mengingat alamatnya." },
+        { q: "Dalam penempatan server di ruang data, diperlukan kartu jaringan yang berfungsi menghubungkan unit komputer secara fisik menggunakan kabel ke perangkat hub atau switch. Perangkat ini disebut...", o: ["Modem", "LAN card", "USB", "CCTV"], a: "b", exp: "LAN Card (NIC) adalah komponen hardware yang menyediakan port fisik bagi kabel jaringan agar data elektronik dapat mengalir masuk dan keluar dari unit komputer ke jaringan lokal." },
+        { q: "Koneksi komputer yang menggunakan kabel dan perangkat penghubung terpusat dalam satu ruangan terbatas atau gedung sering diistilahkan dengan jenis jaringan...", o: ["WAN", "MAN", "LAN", "PAN"], a: "c", exp: "LAN (Local Area Network) adalah klasifikasi jaringan untuk cakupan area kecil, memberikan kecepatan transfer data yang sangat tinggi untuk kebutuhan internal kantor." },
+        { q: "Untuk membagi distribusi jalur internet dari satu sumber ke beberapa komputer client di ruang kerja secara adil dan stabil, perangkat yang digunakan adalah...", o: ["Wireless USB", "LAN card", "Switch hub", "RJ45"], a: "c", exp: "Switch Hub bertindak sebagai pengatur lalu lintas data cerdas yang mengarahkan paket informasi hanya ke komputer tujuan yang membutuhkan di dalam jaringan lokal." },
+        { q: "Peralatan yang menggabungkan fungsi modulasi untuk merubah sinyal digital menjadi analog dan sebaliknya guna transmisi data melalui jalur komunikasi adalah...", o: ["Modem", "Router", "Switch", "Hub"], a: "a", exp: "Modem (Modulator-Demodulator) adalah jembatan krusial yang menerjemahkan sinyal komputer (digital) menjadi sinyal yang dapat merambat melalui kabel telepon atau fiber (analog)." },
+        { q: "Dalam koordinasi wilayah hukum yang mencakup satu negara, diperlukan infrastruktur jaringan berskala besar yang mampu menghubungkan banyak titik geografis yang berjauhan. Jaringan ini disebut...", o: ["LAN", "MAN", "WAN", "Intranet"], a: "c", exp: "WAN (Wide Area Network) menghubungkan berbagai LAN yang terpisah secara geografis, seringkali melintasi batas kota atau negara menggunakan jalur komunikasi publik atau sewa." },
+        { q: "Saat merancang sistem pelaporan digital, operator perlu memahami singkatan dari protokol utama yang memungkinkan akses ke informasi visual secara mendunia, yaitu WWW. Kepanjangannya adalah...", o: ["World Wide Web", "World Wird Wide", "Word Wide Web", "World Wireless Web"], a: "a", exp: "World Wide Web adalah sistem ruang informasi di mana dokumen dan sumber daya web lainnya diidentifikasi oleh URL dan dapat diakses melalui internet." },
+        { q: "Muncul kebutuhan untuk mencari informasi spesifik mengenai regulasi terbaru melalui mesin pencari (search engine). Contoh dari penyedia layanan tersebut adalah...", o: ["Blogger", "Gmail", "Google", "ISP"], a: "c", exp: "Google merupakan salah satu mesin pencari paling canggih yang menggunakan algoritma khusus untuk mengindeks dan menyajikan informasi relevan dari seluruh dunia." },
+        { q: "Dalam penanganan dokumen digital, tindakan mengambil data atau informasi dari sebuah situs web untuk disimpan secara permanen di dalam penyimpanan komputer lokal disebut...", o: ["Upload", "Download", "Browsing", "Surfing"], a: "b", exp: "Download (Unduh) adalah proses transfer data dari remote server (pusat) ke lokal komputer (pengguna) untuk keperluan pengarsipan atau pemrosesan offline." },
+        { q: "Kecepatan akses internet di ruang kerja sering diukur menggunakan satuan jumlah bit yang ditransfer per detik. Satuan standar tersebut dikenal dengan...", o: ["GPRS", "BPS", "ISP", "DSL"], a: "b", exp: "BPS (Bits Per Second) adalah ukuran dasar kecepatan transfer data. Semakin tinggi angka BPS (seperti Mbps atau Gbps), semakin cepat data diterima dan dikirim." },
+        { q: "Untuk menjaga kerahasiaan saat berkoordinasi, operator seringkali harus login ke akun e-mail menggunakan dua kunci identitas utama yang telah didaftarkan sebelumnya, yaitu...", o: ["Username dan e-mail", "Nama dan e-mail", "E-mail dan website", "E-mail dan password"], a: "d", exp: "E-mail bertindak sebagai identitas pengguna, sedangkan Password berfungsi sebagai kunci otentikasi rahasia untuk menjamin bahwa hanya pemilik akun yang dapat mengakses data." },
+        { q: "Dalam infrastruktur jaringan di perkantoran instansi, topologi yang menempatkan satu perangkat pusat sebagai kontroler seluruh aliran data ke komputer lain sering disebut sebagai...", o: ["Star", "Bus", "Ring", "Tree"], a: "a", exp: "Topologi Star (Bintang) sangat handal karena jika salah satu kabel ke komputer client terputus, jaringan di komputer lainnya tidak akan terganggu, menjamin kelangsungan operasional." },
+        { q: "Muncul kendala pada kode bahasa pemrograman halaman web yang menyebabkan fungsi input data macet. Submenu yang digunakan untuk mendeteksi kesalahan kode tersebut secara teknis adalah...", o: ["Script debugger", "Source", "Encoding", "Privacy Report"], a: "a", exp: "Script Debugger adalah alat analisis teknis yang membantu menemukan baris kode yang menyebabkan kegagalan fungsi pada aplikasi berbasis web." },
+        { q: "Sebutan bagi perusahaan atau pihak yang menyewakan jalur komunikasi agar unit komputer di daerah dapat terhubung ke jaringan internet global adalah...", o: ["Telkom", "Indosat", "Kantor Pos", "ISP"], a: "d", exp: "ISP (Internet Service Provider) adalah vendor yang menyediakan infrastruktur, IP address, dan bandwidth agar pelanggan dapat mengakses fasilitas internet secara legal." },
+        { q: "Dalam sejarah pengembangan komunikasi digital nasional, terdapat nomor telepon akses khusus yang pernah populer digunakan untuk koneksi dial-up instan, yaitu...", o: ["0809 8 9999", "0809 9 8888", "021 8 9999", "0800 1 1234"], a: "a", exp: "0809 8 9999 adalah nomor legendaris layanan Telkomnet Instan yang menggunakan jalur telepon kabel untuk dial-up ke internet sebelum era broadband." },
+        { q: "Penggunaan identitas domain tertentu sangat spesifik untuk membedakan jenis organisasi. Untuk instansi atau organisasi yang bergerak di bidang militer dan pertahanan, domain yang digunakan adalah...", o: ["Gov", "Net", "Mil", "Org"], a: "c", exp: "Domain .mil merupakan singkatan dari Military, yang dikhususkan bagi entitas militer resmi guna memberikan identitas keamanan dan otoritas yang jelas di ruang siber." },
+        { q: "Seorang personel ingin membagikan draf kebijakan secara transparan kepada publik melalui jurnal harian digital pribadi atau organisasi yang dapat dikomentari audiens. Media ini disebut...", o: ["E-mail", "Blog", "FTP", "Milis"], a: "b", exp: "Blog (Web Log) adalah situs web yang berfungsi sebagai jurnal atau media publikasi konten secara berkala yang memungkinkan interaksi sosial antar pembaca." },
+        { q: "Agar komputer di ruang rapat dapat menangkap sinyal internet tanpa menggunakan kabel, diperlukan titik akses nirkabel (Wireless) yang dikenal dengan istilah...", o: ["Hotspot", "Dial-up", "Lease line", "Night Server"], a: "a", exp: "Hotspot adalah area yang terjangkau oleh sinyal Wi-Fi dari sebuah Access Point, memungkinkan perangkat mobile terhubung ke jaringan tanpa ketergantungan kabel fisik." },
+        { q: "Muncul instruksi untuk memastikan koneksi internet menumpang pada jalur telepon rumah atau kantor yang sudah ada. Jenis koneksi ini secara teknis dikenal sebagai...", o: ["Dial-up connection", "Lease line", "Fix phone", "Temporary"], a: "a", exp: "Dial-Up menggunakan modem untuk memanggil nomor akses khusus melalui kabel telepon, sebuah metode koneksi klasik yang masih dipelajari sebagai dasar teori komunikasi data." },
+        { q: "Teks atau tombol di halaman web yang jika diarahkan kursor (mouse over) akan berubah warna dan jika diklik akan memicu aksi tertentu merupakan implementasi dari...", o: ["Scripting", "Encoding", "Link/Interactive Button", "Privacy"], a: "c", exp: "Elemen interaktif ini memberikan umpan balik visual kepada pengguna, menandakan bahwa objek tersebut memiliki fungsi navigasi atau aksi tertentu di dalam sistem web." },
+        { q: "Pada awalnya, jaringan komputer global yang kita kenal sekarang merupakan proyek riset militer dari Departemen Pertahanan Amerika Serikat yang disebut...", o: ["Intranet", "Network", "ARPAnet", "Bitnet"], a: "c", exp: "ARPANet adalah cikal bakal internet yang dikembangkan pada tahun 60-an untuk menciptakan jaringan komunikasi yang tahan terhadap serangan dan tetap berfungsi meski sebagian jalurnya terputus." },
+        { q: "Dalam penjelajahan internet, seringkali operator perlu menandai alamat situs penting agar mudah ditemukan kembali di kemudian hari tanpa mengetik ulang. Fitur ini disebut...", o: ["History", "Favorites/Bookmark", "Media", "Back"], a: "b", exp: "Favorites (di Internet Explorer) atau Bookmark (di Chrome) berfungsi menyimpan URL secara permanen dalam folder khusus untuk akses cepat di masa mendatang." },
+        { q: "Saat sedang input data rahasia di web browser, operator perlu melihat laporan mengenai kebijakan situs tersebut terhadap data pengguna. Perintah yang digunakan adalah...", o: ["Encoding", "Privacy Report", "Source", "Debugger"], a: "b", exp: "Privacy Report memberikan ringkasan tentang bagaimana sebuah situs mengelola cookie dan data pribadi pengguna, sangat penting untuk aspek kesadaran keamanan informasi." },
+        { q: "Format file yang umum digunakan untuk menyimpan seluruh isi halaman web ke dalam penyimpanan komputer agar dapat dibaca offline adalah...", o: ["Save As Text", "Save As Doc", "Save Web Page", "Save Image"], a: "c", exp: "Opsi Save Web Page akan menyimpan kode HTML beserta folder pendukungnya (gambar, script) sehingga tampilan web tetap utuh meski tanpa koneksi internet." },
+        { q: "Muncul kendala pada modem eksternal yang tidak terdeteksi oleh sistem operasi. Program pembantu (wizard) yang digunakan untuk mendeteksi perangkat keras baru tersebut adalah...", o: ["New connection wizard", "Update connection wizard", "Add new hardware wizard", "Found new hardware wizard"], a: "c", exp: "Add New Hardware Wizard adalah fitur sistem operasi yang secara sistematis mencari dan menginstal driver untuk perangkat baru yang terpasang pada port komputer." },
+        { q: "Salah satu kelebihan utama internet dalam menunjang tugas administrasi di lapangan adalah kemampuannya mengirimkan informasi secara instan tanpa terhambat oleh...", o: ["Jalur birokrasi", "Biaya listrik", "Hardware komputer", "Sinyal radio"], a: "a", exp: "Internet memotong rantai birokrasi fisik, memungkinkan dokumen instruksi sampai ke tujuan dalam hitungan detik terlepas dari jarak geografis yang jauh." },
+        { q: "Seorang personel ingin membagikan video dokumentasi hasil patroli melalui website televisi nasional secara langsung tanpa proses unduh. Teknologi ini dikenal sebagai...", o: ["Download", "Upload", "Live Streaming", "Teleconference"], a: "c", exp: "Live Streaming memungkinkan audiens menonton konten video secara real-time saat data dikirimkan melalui jaringan tanpa perlu menunggu seluruh file terunduh ke komputer." },
+        { q: "Dalam pembuatan akun e-mail baru untuk kepentingan dinas, operator harus memastikan ketersediaan ID yang diinginkan agar tidak terjadi duplikasi dengan akun lain. Tombol verifikasinya adalah...", o: ["Advanced Search", "Language Tools", "Check availability of this ID", "Continue registration"], a: "c", exp: "Fitur ini melakukan pencarian di database global penyedia e-mail untuk memastikan bahwa nama pengguna (username) yang dipilih belum digunakan oleh orang lain." },
+        { q: "Saat mengetik alamat situs pada browser, operator sering menemukan protokol HTTP di bagian awal. Singkatan teknis dari protokol tersebut adalah...", o: ["Hypertext Transfer Protocol", "Hyper Transfer Terminal", "High Text Transfer", "Hyper Technical Transfer"], a: "a", exp: "HTTP adalah protokol inti yang mengatur bagaimana pesan diformat dan ditransmisikan, serta tindakan apa yang harus dilakukan browser dan server dalam merespons perintah." },
+        { q: "Dalam jaringan nirkabel (Wi-Fi), stabilitas koneksi sangat dipengaruhi oleh jarak fisik antara perangkat komputer dengan pemancar sinyal yang disebut...", o: ["Access Point", "Switch", "Hub", "Server"], a: "a", exp: "Access Point adalah pemancar sinyal nirkabel. Radius jangkauannya menentukan sejauh mana perangkat dapat terhubung dengan stabil (umumnya hingga 100-150 meter)." },
+        { q: "Seorang administrator jaringan ingin melihat kode sumber asli (Source Code) dari sebuah halaman web guna menganalisis struktur keamanannya. Perintah menu yang digunakan adalah...", o: ["View - Refresh", "View - Source", "File - Properties", "Tools - Encoding"], a: "b", exp: "View Source menampilkan baris-baris kode HTML mentah di balik sebuah tampilan visual web, memudahkan teknisi melakukan audit atau perbaikan tampilan." },
+        { q: "Dalam penggunaan internet untuk riset, ditemukan istilah Gopher yang merupakan pendahulu web. Kegunaan utama dari sistem Gopher tersebut adalah...", o: ["Mengirim e-mail", "Ngobrol online", "Mencari dan mengambil informasi di komputer lain", "Melihat video"], a: "c", exp: "Gopher adalah sistem informasi berbasis menu yang sangat populer sebelum era World Wide Web, berfungsi untuk navigasi dan pengambilan file di jaringan komputer global." },
+        { q: "Jenis layanan internet yang memungkinkan akses data sangat cepat hingga 115 kbps melalui perangkat handphone tanpa bantuan kabel fisik sering diidentikkan dengan teknologi...", o: ["Dial-up", "GPRS", "Fiber optic", "ISDN"], a: "b", exp: "GPRS (General Packet Radio Service) adalah teknologi pengiriman data nirkabel pada jaringan seluler yang menjadi dasar akses internet mobile di era awal." },
+        { q: "Salah satu bahaya utama yang harus diwaspadai oleh setiap personel saat berselancar di internet dan mengunduh berkas dari sumber yang tidak terpercaya adalah...", o: ["Biaya mahal", "Penyebaran virus komputer", "Hardware rusak", "Layar monitor mati"], a: "b", exp: "Internet merupakan jalur utama penyebaran malware dan virus. Personel diwajibkan selalu waspada terhadap file asing guna menjaga integritas data rahasia instansi." },
+        { q: "Sistem identitas digital di internet mulai berkembang pesat pada tahun 80-an dengan diperkenalkannya DNS. Fungsi utama dari DNS adalah...", o: ["Mengirim e-mail", "Menerjemahkan alamat IP menjadi nama domain", "Menghapus virus", "Membuat halaman web"], a: "b", exp: "DNS (Domain Name System) mempermudah manusia mengakses internet dengan menggunakan nama (seperti polri.go.id) alih-alih harus menghafal deretan angka alamat IP yang rumit." },
+        { q: "Untuk memindahkan kursor secara cepat di dalam jendela browser tanpa menggunakan mouse saat berpindah antar kotak isian (form), operator menggunakan tombol...", o: ["Enter", "Space", "Tab", "Shift"], a: "c", exp: "Tombol Tab secara teknis memindahkan fokus navigasi dari satu elemen interaktif ke elemen berikutnya secara berurutan, mempercepat proses penginputan data digital." }
+    ];
+
+    function shuffleOptions() {
+        questions.forEach(q => {
+            const correctText = q.o[q.a.charCodeAt(0) - 97];
+            q.o.sort(() => Math.random() - 0.5);
+            q.a = String.fromCharCode(97 + q.o.indexOf(correctText));
+        });
+    }
+
+    let currentIdx = 0;
+    const expiredDate = "2028-07-01";
+
+    function startQuiz() {
+        const today = new Date().toISOString().split('T')[0];
+        if (today > expiredDate) { alert("Masa berlaku link telah berakhir."); return; }
+        const name = document.getElementById('userNameInput').value.trim();
+        if (!name) { alert("Masukkan Nama Lengkap!"); return; }
+        pesertaName = name;
+        document.getElementById('login-overlay').style.display = 'none';
+        shuffleOptions();
+        initQuiz();
+    }
+
+    function initQuiz() {
+        const container = document.getElementById('soalContainer');
+        const grid = document.getElementById('gridNav');
+        container.innerHTML = "";
+        grid.innerHTML = "";
+        questions.forEach((s, i) => {
+            const div = document.createElement('div');
+            div.className = 'q-wrapper';
+            div.id = `q${i}`;
+            let opts = s.o.map((opt, idx) => {
+                const char = String.fromCharCode(97 + idx);
+                return `<label><input type="radio" name="ans${i}" value="${char}" onchange="hAns(${i})"> ${char.toUpperCase()}. ${opt}</label>`;
+            }).join('');
+            div.innerHTML = `<div class="q-text">${i+1}. ${s.q}</div><div class="options">${opts}</div>`;
+            container.appendChild(div);
+
+            const btn = document.createElement('button');
+            btn.id = `nav${i}`; btn.innerText = i + 1;
+            btn.onclick = () => jump(i);
+            grid.appendChild(btn);
+        });
+        showSoal(0);
+    }
+
+    function hAns(idx) {
+        document.getElementById(`nav${idx}`).classList.add('done');
+        if (currentIdx < questions.length - 1) setTimeout(() => { move(1); }, 400);
+    }
+
+    function showSoal(idx) {
+        document.querySelectorAll('.q-wrapper').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById(`q${idx}`);
+        if(target) target.classList.add('active');
+        
+        document.querySelectorAll('.nav-grid button').forEach(el => el.classList.remove('current'));
+        const navBtn = document.getElementById(`nav${idx}`);
+        if(navBtn) navBtn.classList.add('current');
+        
+        document.getElementById('prevBtn').disabled = (idx === 0);
+        document.getElementById('nextBtn').innerText = (idx === questions.length - 1) ? "SELESAI" : "LANJUT";
+        currentIdx = idx;
+    }
+
+    function move(step) {
+        if (currentIdx === questions.length - 1 && step === 1) { finishQuiz(); return; }
+        showSoal(currentIdx + step);
+    }
+
+    function jump(idx) { showSoal(idx); }
+
+    function finishQuiz() {
+        if (!confirm("Akhiri simulasi teknis internet ini?")) return;
+        let sc = 0;
+        const b = document.getElementById('rekapBody');
+        b.innerHTML = "";
+        questions.forEach((s, i) => {
+            const sel = document.querySelector(`input[name="ans${i}"]:checked`);
+            const u = sel ? sel.value : null;
+            const isC = (u === s.a); if (isC) sc++;
+            const uT = u ? s.o[u.charCodeAt(0) - 97] : "-";
+            const cT = s.o[s.a.charCodeAt(0) - 97];
+            const r = b.insertRow();
+            r.innerHTML = `<td>${i+1}</td><td><strong>URAIAN TAKTIS:</strong> ${s.q}<br><small>Hasil Analisis: (${u?u.toUpperCase():'-'}) ${uT} | Kunci Teknis: (${s.a.toUpperCase()}) ${cT}<br><strong>PEMBAHASAN PAKAR:</strong> ${s.exp}</small></td><td class="${isC?'status-benar':'status-salah'}">${isC?'BENAR':'SALAH'}</td>`;
+        });
+        const fS = (sc / questions.length) * 100;
+        document.getElementById('scoreText').innerText = fS.toFixed(0);
+        document.getElementById('displayUserName').innerText = pesertaName.toUpperCase();
+        document.getElementById('soalContainer').style.display = 'none';
+        document.getElementById('navFooter').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        window.scrollTo(0,0);
+    }
+
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(14);
+        doc.text("BERITA ACARA HASIL SIMULASI TKK INTERNET & JARINGAN", 105, 15, { align: "center" });
+        doc.setFontSize(12);
+        doc.text("PERSONA RESEARCH & CONSULTING", 105, 22, { align: "center" });
+        doc.line(10, 25, 200, 25);
+        doc.text("Nama Peserta : " + pesertaName.toUpperCase(), 15, 35);
+        doc.text("Nilai Akhir  : " + document.getElementById('scoreText').innerText + " / 100", 15, 42);
+        const rs = [];
+        questions.forEach((s, i) => {
+            const sel = document.querySelector(`input[name="ans${i}"]:checked`);
+            const isC = (sel && sel.value === s.a);
+            rs.push([i+1, s.q.substring(0, 80) + "...", isC ? "BENAR" : "SALAH"]);
+        });
+        doc.autoTable({ startY: 50, head: [['No', 'Analisis Taktis', 'Status']], body: rs, theme: 'grid', headStyles: { fillColor: [0, 0, 0] } });
+        doc.save(`BA_Hasil_TKK_INTERNET_${pesertaName}.pdf`);
+    }
+</script>
+</body>
+</html>

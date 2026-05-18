@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAT UJI KOMPUTER MS WORD - Persona Research & Consulting</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root { --gold: #D4AF37; --ivory: #FFFFF0; --black: #000000; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--ivory); color: var(--black); margin: 0; padding: 10px; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; user-select: none; -webkit-user-select: none; }
+        .container { max-width: 900px; background: white; margin: auto; padding: 25px; border-radius: 10px; border-top: 8px solid var(--black); box-shadow: 0 4px 20px rgba(0,0,0,0.15); flex: 1; display: flex; flex-direction: column; }
+        .header { text-align: center; border-bottom: 3px double var(--gold); margin-bottom: 20px; padding-bottom: 15px; }
+        .header h2 { margin: 0; font-size: 1.4em; font-weight: 900; text-transform: uppercase; color: var(--black); letter-spacing: 1px; }
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; border-top: 6px solid var(--gold); width: 90%; max-width: 450px; }
+        .login-box input { width: 100%; padding: 15px; margin: 20px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 1.1em; text-align: center; }
+        .q-wrapper { display: none; width: 100%; }
+        .q-wrapper.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .q-text { color: #1a1a1a; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; border-left: 5px solid var(--gold); padding-left: 15px; text-align: justify; }
+        .options { display: grid; gap: 10px; }
+        .options label { display: flex; align-items: center; padding: 15px; background: #f9f9f9; border: 1.5px solid #eee; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .options label:hover { background: #fffcf0; border-color: var(--gold); }
+        .options input { margin-right: 15px; transform: scale(1.4); accent-color: var(--black); }
+        .nav-footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; }
+        .nav-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-bottom: 20px; }
+        .nav-grid button { padding: 8px 0; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 5px; }
+        .nav-grid button.done { background: var(--black); color: white; }
+        .nav-grid button.current { border: 2px solid var(--gold); font-weight: bold; }
+        .btn-action { background: var(--black); color: white; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; border-radius: 8px; text-transform: uppercase; transition: 0.3s; }
+        .btn-action:hover { background: var(--gold); }
+        #result-area { display: none; text-align: center; }
+        .score-val { font-size: 5em; font-weight: 900; color: var(--black); }
+        .rekap-table { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 0.85em; text-align: left; }
+        .rekap-table th, .rekap-table td { border: 1px solid #ddd; padding: 12px; }
+        .status-benar { color: green; font-weight: bold; }
+        .status-salah { color: red; font-weight: bold; }
+        .page-footer { text-align: center; padding: 20px; font-size: 0.9em; color: var(--black); font-weight: bold; }
+    </style>
+</head>
+<body oncontextmenu="return false" oncopy="return false" oncut="return false" onkeydown="return (event.keyCode != 123)">
+
+<div id="login-overlay">
+    <div class="login-box">
+        <h2 style="margin:0;">PERSONA RESEARCH & CONSULTING</h2>
+        <h3 style="color: var(--gold); margin-top:5px;">UJI KOMPETENSI TKK MS WORD</h3>
+        <p>Gunakan logika operasional administrasi Polri untuk menjawab setiap studi kasus di bawah ini.</p>
+        <input type="text" id="userNameInput" placeholder="MASUKKAN NAMA LENGKAP..." autocomplete="off">
+        <button class="btn-action" onclick="startQuiz()">MULAI SIMULASI</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h2>PERSONA RESEARCH & CONSULTING</h2>
+        <small style="color: var(--gold); font-weight: bold; letter-spacing: 1px;">MODUL: ADVANCED MS WORD</small>
+    </div>
+
+    <form id="quizForm">
+        <div id="soalContainer"></div>
+        <div id="result-area">
+            <h3 id="displayUserName" style="color:var(--gold);"></h3>
+            <h2>SKOR AKHIR ANDA</h2>
+            <div class="score-val" id="scoreText">0</div>
+            <button type="button" class="btn-action" onclick="downloadPDF()">UNDUH HASIL DAN PEMBAHASAN  (PDF)</button>
+            <div style="overflow-x: auto;">
+                <table class="rekap-table">
+                    <thead><tr><th>No</th><th>Analisis Studi Kasus</th><th>Status</th></tr></thead>
+                    <tbody id="rekapBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+
+    <div class="nav-footer" id="navFooter">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <button class="btn-action" id="prevBtn" onclick="move(-1)" disabled>KEMBALI</button>
+            <button class="btn-action" id="nextBtn" onclick="move(1)">LANJUT</button>
+        </div>
+        <div class="nav-grid" id="gridNav"></div>
+    </div>
+</div>
+
+<footer class="page-footer">Persona Research & Consulting | Hotline: 0877 4251 5786</footer>
+
+<script>
+    let pesertaName = "";
+    // Data soal asli Anda
+    let questions = [
+        { cat:'WORD', level:'hard', weight:5, q:'Pukul 07.45 WIB, 15 menit sebelum paparan Kasat Reskrim dimulai, operator menyadari draf laporan kronologis yang disusun di komputer piket terlihat berantakan saat dibuka di laptop ruang rapat. Masalah: Jenis huruf (font) khusus yang diwajibkan dalam tata naskah dinas berubah menjadi "Arial" karena laptop rapat tidak memiliki font tersebut, sehingga jumlah halaman membengkak dan tata letak tabel berantakan. Tindakan paling profesional dan cepat agar dokumen tampil identik 100% tanpa harus menginstal font di laptop rapat adalah...', o:['Mengubah seluruh jenis huruf di dokumen menjadi Arial agar seragam di semua perangkat.', 'Melakukan screenshot pada setiap halaman lalu menempelkannya kembali ke Ms. Word.', 'Menyimpan ulang file dengan masuk ke Options > Save > centang "Embed fonts in the file".', 'Mengirim file tersebut ke teknisi IT untuk dikonversi secara manual melalui server.', 'Mencetak dokumen ke dalam format gambar (JPEG) per halaman lalu digabungkan.'], a:'c', exp:'Dalam dunia kerja profesional Polri, menjaga integritas visual naskah dinas adalah kewajiban. Fitur "Embed fonts" memungkinkan file membawa data font asli di dalam dokumennya sendiri.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Operator Bag Ops sedang menyusun naskah Rencana Operasi (Renops) setebal 250 halaman. Pimpinan meminta agar "Peta Kerawanan" pada halaman 112 ditampilkan dalam posisi Landscape (melebar), sementara halaman 111 dan 113 harus tetap Portrait (tegak). Masalah: Saat operator mengubah orientasi di halaman 112, seluruh halaman dari nomor 1 hingga 250 ikut berubah menjadi Landscape. Langkah teknis yang paling tepat untuk mengisolasi perubahan orientasi hanya pada halaman 112 adalah...', o:['Menggunakan fitur "Page Break" tepat sebelum dan sesudah halaman 112.', 'Memisahkan halaman 112 ke dalam file Microsoft Word yang berbeda.', 'Menempatkan kursor di awal halaman 112, lalu menyisipkan "Section Break (Next Page)" dan mengubah orientasi di section tersebut.', 'Mengatur margin kiri dan kanan pada halaman 112 menjadi sangat lebar agar teks terlihat memanjang.', 'Menggunakan fitur "Columns" menjadi dua bagian khusus pada halaman 112.'], a:'c', exp:'Hanya "Section Break" yang mampu memutus keterkaitan format antar-halaman secara permanen.' },
+        { cat:'WORD', level:'medium', weight:3, q:'Menjelang pergantian piket malam, operator SPKT menerima revisi mendadak laporan kecelakaan menonjol. File harus segera dicetak dan dikirim ke Polres dalam 5 menit. Masalah: Saat dibuka, terdapat banyak spasi ganda (double space) di antara kata-kata yang membuat dokumen terlihat tidak profesional dan melanggar aturan tata naskah. Cara tercepat untuk merapikan seluruh spasi ganda menjadi spasi tunggal di seluruh dokumen adalah...', o:['Membaca manual satu per satu dan menghapus spasi menggunakan tombol Backspace.', 'Menekan Ctrl + A, lalu memilih fitur "AutoFormat Now".', 'Menggunakan Ctrl + H, isi "  " (dua spasi) di kolom Find dan " " (satu spasi) di kolom Replace, lalu klik Replace All.', 'Mengatur perataan paragraf menjadi "Justify" agar spasi terlihat lebih rapat secara otomatis.', 'Menghapus seluruh paragraf yang berantakan lalu mengetik ulang dengan cepat.'], a:'c', exp:'Find and Replace (Ctrl+H) bukan hanya untuk kata, tapi juga untuk karakter spasi.' },
+        { cat:'WORD', level:'hard', weight:4, q:'Operator SDM sedang mengolah draf pengumuman kelulusan seleksi Bintara. Pimpinan ingin agar tabel daftar nama (500 baris) memiliki judul kolom (No, Nama, Nilai, Keterangan) yang muncul otomatis di bagian atas setiap halaman agar pembaca tidak bingung. Masalah: Operator melakukan copy-paste judul manual, namun saat ada penambahan satu nama di tengah, urutan judul di halaman-halaman berikutnya menjadi berantakan. Solusi paling stabil adalah...', o:['Mengecilkan ukuran font tabel agar seluruh 500 nama muat dalam satu halaman saja.', 'Menggunakan fitur "Split Table" di setiap awal halaman baru.', 'Memblok baris judul tabel, lalu mengaktifkan "Repeat Header Rows" pada tab Table Tools Layout.', 'Mengatur "Page Break" secara manual tepat sebelum baris judul di setiap halaman.', 'Membuat tabel baru untuk setiap halaman agar judul tetap konsisten.'], a:'c', exp:'"Repeat Header Rows" memastikan baris judul tetap berada di posisi paling atas meskipun baris di bawahnya bergeser.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Unit Reskrim sedang menyusun draf BAP yang memuat kutipan keterangan saksi yang sangat panjang. Sesuai aturan, kutipan tersebut harus menjorok ke dalam (indentasi) baik dari sisi kiri maupun kanan agar berbeda dari narasi penyidik. Masalah: Operator menggunakan tombol spasi berkali-kali untuk menggeser teks, namun saat jenis huruf diubah, posisi kutipan menjadi berantakan. Cara paling tepat dan permanen untuk mengatur indentasi tersebut adalah...', o:['Menekan tombol "Tab" di setiap baris kalimat kutipan.', 'Mengatur nilai "Left Indent" dan "Right Indent" secara bersamaan di menu Paragraph.', 'Menggunakan fitur "Center Alignment" agar teks berada di tengah-tengah.', 'Memasukkan teks kutipan ke dalam "Text Box" yang transparan.', 'Menggeser seluruh margin dokumen khusus untuk halaman kutipan tersebut.'], a:'b', exp:'Indentasi paragraf memastikan teks tetap konsisten menjorok terlepas dari jenis atau ukuran font.' },
+        { cat:'WORD', level:'medium', weight:3, q:'Operator Intelkam sedang mengetik laporan informasi rahasia. Pimpinan meminta agar "Nomor Telegram" yang sering diketik berulang-ulang secara otomatis berubah menjadi teks lengkap hanya dengan mengetik kode singkat "NTG" diikuti spasi. Masalah: Operator lupa di mana letak pengaturan untuk mendaftarkan kode singkat tersebut. Fitur yang dimaksud berada pada...', o:['Word Options > Proofing > AutoCorrect Options', 'Insert > Quick Parts > Document Property', 'Home > Find and Replace > More Options', 'References > Cross-reference', 'Review > Language Preferences'], a:'a', exp:'AutoCorrect bisa dimanfaatkan sebagai "Shortcode" untuk efisiensi pengetikan istilah kedinasan.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Seorang operator di Biro Logistik sedang memperbaiki file draf kontrak pengadaan barang yang disusun oleh operator sebelumnya. Masalah: Terdapat banyak simbol-symbols aneh seperti titik di antara kata dan tanda panah yang sangat mengganggu pandangan, namun simbol tersebut tidak muncul saat diprint. Langkah tercepat untuk menyembunyikan simbol teknis tersebut tanpa menghapus fungsinya adalah...', o:['Mengubah warna font menjadi putih agar simbol tidak terlihat.', 'Menonaktifkan fitur "Track Changes" di tab Review.', 'Menekan shortcut "Ctrl + Shift + 8" atau mengklik ikon Show/Hide (¶) di tab Home.', 'Melakukan "Clear All Formatting" pada seluruh dokumen.', 'Menutup aplikasi dan membukanya kembali dalam Safe Mode.'], a:'c', exp:'Shortcut Ctrl+Shift+8 adalah cara cepat untuk beralih (toggle) tampilan simbol teknis.' },
+        { cat:'WORD', level:'hard', weight:4, q:'Dalam penyusunan majalah internal "Tribrata", operator ingin menyisipkan foto kegiatan Kapolres. Masalah: Foto tersebut harus berada di tengah-tengah paragraf, dan teks harus mengalir secara rapat mengikuti lekuk tubuh (outline) objek dalam foto, bukan sekadar kotak di sekelilingnya. Pengaturan "Wrap Text" yang paling tepat digunakan adalah...', o:['In Line with Text', 'Square', 'Tight', 'Behind Text', 'In Front of Text'], a:'c', exp:'Wrap Text "Tight" memungkinkan teks mengalir mengikuti batas-batas objek/gambar.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Operator Ditlantas diperintahkan mencetak 500 lembar surat teguran pelanggaran ETLE menggunakan data dari Excel. Masalah: Saat proses Mail Merge dilakukan, format tanggal pada Word muncul sebagai "MM/DD/YYYY", padahal di Excel sudah "DD/MM/YYYY". Mengingat batas waktu pengiriman sore ini, solusi paling profesional untuk memperbaiki format tanggal langsung di Word tanpa merubah database Excel adalah...', o:['Mengetik manual tanggal di setiap 500 lembar surat satu per satu.', 'Mengubah regional setting komputer menjadi bahasa Indonesia lalu restart Word.', 'Klik kanan pada field tanggal di Word > Toggle Field Codes > tambahkan switch \\@ "dd MMMM yyyy".', 'Melakukan copy-paste tabel Excel sebagai gambar ke dalam naskah Word.', 'Menghapus field tanggal dan menggantinya dengan teks biasa yang diketik manual.'], a:'c', exp:'Dengan memanipulasi Field Codes, operator bisa memaksa Word menampilkan format data sesuai keinginan.' },
+        { cat:'WORD', level:'medium', weight:3, q:'Operator ingin mengirimkan draf Peraturan Kapolri (Perkap) ke pimpinan untuk dikoreksi. Pimpinan meminta agar setiap coretan, tambahan kata, atau perubahan format yang dilakukan oleh pimpinan dapat terekam secara otomatis sehingga operator bisa melihat revisinya dengan jelas. Fitur yang harus diaktifkan sebelum file diserahkan ke pimpinan adalah...', o:['Restrict Editing', 'Protect Document', 'Track Changes', 'Compare and Combine', 'Document Inspector'], a:'c', exp:'Track Changes merekam setiap tindakan (menghapus, menambah, merubah font) pimpinan.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Operator Humas sedang membuat buletin informasi kamtibmas. Terdapat satu paragraf penting yang tidak boleh terpisah antar-halaman. Masalah: Saat teks ditambah di atasnya, paragraf tersebut terpecah. Pengaturan paragraf yang harus diaktifkan agar satu paragraf tersebut selalu berpindah secara utuh ke halaman baru adalah...', o:['Widow/Orphan control', 'Keep with next', 'Keep lines together', 'Page break before', 'Hanging indent'], a:'c', exp:'"Keep lines together" memerintahkan Word untuk tidak membagi baris-baris dalam satu paragraf ke halaman berbeda.' },
+        { cat:'WORD', level:'hard', weight:4, q:'Saat menyusun daftar isi manual untuk laporan yang sangat mendesak, operator kesulitan meratakan titik-titik daftar isi agar lurus sejajar di margin kanan. Masalah: Mengetik titik manual membuat tampilan bergelombang. Cara paling profesional dan rapi untuk membuat titik-titik tersebut secara otomatis adalah...', o:['Menggunakan tabel dengan border titik-titik.', 'Menekan tombol spasi hingga mencapai margin.', 'Mengatur "Tabs" pada Ruler dan memilih "Leader" nomor 2.', 'Menggunakan fitur "Justify" pada seluruh baris.', 'Mengubah font menjadi "Courier New".'], a:'c', exp:'Penggunaan Tabs dengan Leader memungkinkan pengisian ruang kosong dengan titik-titik lurus sempurna.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Seorang staf di Sekretariat Umum (Setum) menerima file dari unit lain untuk digabungkan. Masalah: File tersebut memiliki ribuan hyperlink aktif yang merujuk ke website eksternal, dan pimpinan meminta semua hyperlink tersebut dihapus namun teks aslinya tetap ada. Cara tercepat untuk menghapus semua hyperlink sekaligus adalah...', o:['Klik kanan satu per satu.', 'Menghapus teks lalu mengetik ulang.', 'Menyeleksi seluruh dokumen (Ctrl+A) lalu menekan shortcut "Ctrl + Shift + F9".', 'Mengubah warna teks secara manual.', 'Menyimpan file sebagai "Plain Text (.txt)".'], a:'c', exp:'Shortcut Ctrl+Shift+F9 adalah perintah untuk "Unlink Fields" yang mengubah objek dinas menjadi teks statis.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Operator sedang mengerjakan laporan operasi yang memuat banyak tabel dan gambar. Pimpinan meminta agar posisi tabel berada tepat di tengah halaman secara horizontal, namun teks di bawahnya tetap rata kiri. Cara paling stabil adalah...', o:['Memblok tabel lalu menekan Ctrl + E.', 'Menggeser tabel menggunakan kursor mouse.', 'Klik kanan pada tabel > Table Properties > Tab Table > Alignment pilih Center.', 'Mengatur margin tabel menggunakan Ruler.', 'Menyisipkan kolom kosong di sisi kiri dan kanan.'], a:'c', exp:'Mengatur Alignment tabel melalui "Table Properties" mengunci posisi tabel berdasarkan margin dokumen.' },
+        { cat:'WORD', level:'medium', weight:2, q:'Operator ingin memasukkan simbol "Tribrata" atau simbol khusus lain yang tidak tersedia pada keyboard ke dalam naskah dinas. Menu yang harus diakses adalah...', o:['Insert > SmartArt', 'Insert > Symbol > More Symbols', 'Insert > Icons', 'Home > Font > Webdings', 'Layout > Character Map'], a:'b', exp:'Menu Insert > Symbol menyediakan ribuan karakter khusus (Unicode).' },
+        { cat:'WORD', level:'hard', weight:4, q:'Operator sedang mengetik draf Surat Perintah (Sprin). Pimpinan meminta agar halaman pertama tidak memiliki nomor halaman (Cover), namun halaman kedua tetap memiliki nomor "2". Fitur yang diaktifkan adalah...', o:['Different Odd & Even Pages', 'Show Document Text', 'Different First Page', 'Link to Previous', 'Insert Alignment Tab'], a:'c', exp:'"Different First Page" memungkinkan pengaturan Header/Footer yang unik khusus untuk lembar pertama.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Seorang operator di unit siber sedang menganalisis dokumen Word yang dicurigai mengandung data tersembunyi (metadata). Sebelum file dibagikan, operator harus membersihkan data sensitif tersebut menggunakan fitur...', o:['File > Info > Protect Document', 'File > Info > Inspect Document', 'Review > Accept All Changes', 'File > Options > Proofing', 'View > Draft Mode'], a:'b', exp:'"Inspect Document" memindai metadata dan konten tersembunyi demi keamanan operasional.' },
+        { cat:'WORD', level:'medium', weight:3, q:'Operator ingin membuat garis horisontal panjang di bawah kop surat Polri. Cara tercepat adalah mengetik karakter tiga tanda sama dengan (===) lalu menekan tombol Enter. Fitur ini dikenal sebagai...', o:['AutoFormat As You Type', 'AutoCorrect Options', 'AutoText Gallery', 'Quick Parts', 'Smart Art'], a:'a', exp:'AutoFormat As You Type merubah pola pengetikan menjadi elemen desain otomatis.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Unit Reskrim menyusun laporan ribuan daftar barang bukti dalam tabel yang terpotong ke margin kanan. Pimpinan meminta ukuran kolom menyesuaikan otomatis dengan teks terpanjang di dalamnya. Fitur tercepat adalah...', o:['Menggeser garis kolom satu per satu.', 'Klik kanan pada tabel > AutoFit > AutoFit to Contents.', 'Klik kanan pada tabel > AutoFit > AutoFit to Window.', 'Mengubah orientasi menjadi Landscape.', 'Mengatur lebar kolom menjadi nilai tetap.'], a:'b', exp:'"AutoFit to Contents" menghitung lebar kolom terkecil yang dibutuhkan agar semua teks muat.' },
+        { cat:'WORD', level:'hard', weight:4, q:'Saat menyusun laporan intelijen, operator ingin memindahkan satu paragraf dari halaman 5 ke halaman 2 menggunakan keyboard saja. Shortcut berurutan yang ditekan adalah...', o:['Ctrl + C lalu Ctrl + V', 'Ctrl + X lalu Ctrl + V', 'Ctrl + S lalu Ctrl + O', 'Alt + F4 lalu Ctrl + N', 'Ctrl + Z lalu Ctrl + Y'], a:'b', exp:'Ctrl+X (Cut) menghapus teks asli ke clipboard, Ctrl+V (Paste) menempatkannya di lokasi baru.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Agar laporan Operasi Lilin tercetak dengan urutan yang benar layaknya buku saku yang bisa dilipat (buklet), pengaturan di Page Setup yang harus diubah adalah...', o:['Multiple pages: Mirror margins', 'Multiple pages: 2 pages per sheet', 'Multiple pages: Book fold', 'Orientation: Landscape', 'Paper size: A5'], a:'c', exp:'"Book fold" adalah fitur khusus untuk mengatur urutan cetak dokumen dalam format buklet.' },
+        { cat:'WORD', level:'medium', weight:3, q:'Operator ingin memasukkan angka pangkat pada laporan forensik (Contoh: m² atau CO₂). Fitur yang digunakan berturut-turut adalah...', o:['Bold dan Italic', 'Strikethrough dan Underline', 'Superscript dan Subscript', 'Upper Case dan Lower Case', 'Shadow dan Glow'], a:'c', exp:'Superscript untuk pangkat atas (m²), Subscript untuk pangkat bawah (CO₂).' },
+        { cat:'WORD', level:'hard', weight:5, q:'Situasi: Pimpinan ingin membandingkan file revisi naskah terbaru dengan file asli setahun lalu untuk melihat perubahannya secara akurat. Fitur yang paling tepat adalah...', o:['Review > Compare > Compare...', 'View > Side by Side', 'Review > Track Changes', 'File > Info > Version History', 'Insert > Object > Text from file'], a:'a', exp:'Fitur Compare membandingkan dua file dan menandai setiap perbedaannya secara otomatis.' },
+        { cat:'WORD', level:'hard', weight:4, q:'Situasi: Cara tercepat untuk menghilangkan latar belakang putih foto tanda tangan pimpinan agar menjadi transparan langsung di Word adalah...', o:['Remove Background.', 'Klik gambar > Picture Format > Color > Set Transparent Color.', 'Mengubah Brightness gambar.', 'Mengatur Wrap Text menjadi Behind Text.', 'Menghapus via aplikasi Paint.'], a:'b', exp:'"Set Transparent Color" merubah satu warna solid pada gambar menjadi transparan seketika.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Operator Humas menyusun draf rilis berita dan ingin menyisipkan garis vertikal pemisah di antara kolom teks (seperti koran). Pengaturan ini ada di...', o:['Layout > Columns > Two', 'Layout > Columns > More Columns > centang "Line between"', 'Insert > Shapes > Line', 'Design > Page Borders', 'Home > Borders'], a:'b', exp:'"Line between" pada pengaturan Columns menyisipkan garis pemisah otomatis mengikuti panjang teks.' },
+        { cat:'WORD', level:'medium', weight:3, q:'Pilihan pengaturan pada menu "Page Borders" agar bingkai garis hanya muncul pada halaman pertama (sampul) saja adalah...', o:['Apply to: Whole document', 'Apply to: This section', 'Apply to: This section - First page only', 'Apply to: This section - All except first page', 'Apply to: Selected text'], a:'c', exp:'Opsi "This section - First page only" membatasi bingkai dekoratif hanya pada lembar sampul.' },
+        { cat:'WORD', level:'hard', weight:4, q:'Cara paling profesional agar Word mengenali teks Indonesia (menghilangkan garis merah) pada seluruh dokumen secara massal adalah...', o:['Menekan Ctrl + A > klik status bar "English" > pilih "Indonesian".', 'Mengubah bahasa Windows.', 'Menambahkan kata ke Dictionary satu per satu.', 'Klik Ignore All.', 'Mengubah jenis font.'], a:'a', exp:'Menetapkan bahasa penulisan (Proofing Language) memungkinkan Word melakukan validasi ejaan yang akurat.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Operator menyalin data dari PDF yang barisnya terputus-us (terlalu banyak karakter Enter). Cara tercepat menyatukannya kembali menjadi paragraf normal di Word adalah...', o:['Menghapus Enter manual.', 'Gunakan Ctrl + H, isi "^p" di Find dan " " (spasi) di Replace.', 'Menekan Backspace berulang kali.', 'Mengubah Line Spacing.', 'Clear All Formatting.'], a:'b', exp:'"^p" adalah kode teknis untuk Paragraph Mark; menggantinya menjadi spasi akan menyatukan teks kembali.' },
+        { cat:'WORD', level:'medium', weight:3, q:'Langkah pengamanan yang benar agar dokumen rahasia tidak bisa dibuka tanpa kata sandi saat proses penyimpanan adalah...', o:['File > Info > Protect Document > Encrypt with Password.', 'File > Save As > Tools > General Options > Password to open.', 'Klik kanan > Properties > Hidden.', 'Memasukkan ke folder terenkripsi pihak ketiga.', 'Opsi A dan B benar.'], a:'e', exp:'Word menyediakan enkripsi via menu Info maupun menu Save As General Options.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Situasi: Solusi tercepat agar naskah ukuran Legal pas di kertas A4 tanpa merubah format asli file saat dicetak adalah...', o:['Merubah Page Setup ke A4.', 'Mengecilkan margin.', 'Pada menu Print, pilih "Scale to paper size: A4".', 'Menghapus sebagian teks.', 'Mengecilkan ukuran font.'], a:'c', exp:'Fitur "Scale to paper size" di menu Print melakukan penyesuaian rasio cetak secara otomatis.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Menu untuk merubah format penomoran catatan kaki (footnote) dari angka (1, 2) menjadi huruf (a, b) adalah...', o:['Klik kanan pada nomor footnote > Footnote Options.', 'References > klik panah kecil grup Footnotes > Number format.', 'Home > Numbering > Define New Number Format.', 'Insert > Page Number > Format Page Numbers.', 'Design > Themes > Fonts.'], a:'b', exp:'Dialog Box Footnote and Endnote mengelola detail format penomoran referensi naskah.' },
+        { cat:'WORD', level:'medium', weight:3, q:'Cara tercepat menyisipkan tangkapan layar jendela aplikasi lain yang sedang terbuka langsung ke dalam dokumen Word adalah...', o:['PrintScreen > Paint > Save.', 'Klik tab Insert > Screenshot > pilih jendela yang tersedia.', 'Menggunakan Snipping Tool.', 'Menekan Win + Shift + S lalu paste.', 'Jawaban B dan D benar.'], a:'e', exp:'Word memiliki fitur screenshot terintegrasi dan shortcut sistem Windows + Shift + S adalah metode tercepat.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Fitur tautan internal agar saat teks "Lampiran 1" diklik, kursor otomatis melompat ke halaman lampiran tersebut adalah...', o:['Hyperlink web.', 'Bookmark penanda dan Hyperlink > Place in this document.', 'Cross-reference ke Heading atau Bookmark.', 'Insert > Object > Link to file.', 'Jawaban B dan C benar.'], a:'e', exp:'Bookmark dan Cross-reference memungkinkan navigasi dokumen panjang secara instan dan digital.' },
+        { cat:'WORD', level:'hard', weight:4, q:'Pilihan konversi "Save As PDF" agar ukuran file menjadi sangat kecil untuk dikirim melalui internet lemah adalah...', o:['Standard (publishing online and printing)', 'Minimum size (publishing online)', 'ISO 19005-1 compliant (PDF/A)', 'Optimize for image quality', 'Encrypted PDF'], a:'b', exp:'Opsi "Minimum size" mengompresi resolusi elemen grafis untuk kebutuhan transmisi data online.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Pengaturan agar Word tidak secara otomatis memberikan jarak spasi tambahan antar paragraf setiap kali tombol Enter ditekan adalah...', o:['Line Spacing Options > centang "Don\'t add space between paragraphs of the same style".', 'Layout > Spacing After diatur menjadi 0 pt.', 'Home > Paragraph > No Spacing style.', 'File > Options > Advanced > Editing options.', 'Jawaban A, B, dan C benar.'], a:'e', exp:'Parameter "Spacing After/Before" menentukan kerapatan antar paragraf dalam tata naskah dinas.' },
+        { cat:'WORD', level:'hard', weight:4, q:'Shortcut keyboard untuk menyalin gaya pengetikan (format) saja tanpa ikut menyalin isi teksnya adalah...', o:['Ctrl + C', 'Ctrl + Shift + C', 'Ctrl + V', 'Ctrl + Shift + V', 'Ctrl + Alt + C'], a:'b', exp:'Ctrl + Shift + C berfungsi melakukan "Copy Format" pada teks yang dipilih.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Cara tercepat memutus struktur tabel menjadi dua bagian independen di baris tertentu adalah...', o:['Menghapus baris.', 'Menekan Ctrl + Enter.', 'Menekan Ctrl + Shift + Enter.', 'Klik kanan tabel > Split Table.', 'Jawaban C dan D benar.'], a:'e', exp:'Shortcut Ctrl+Shift+Enter (Split Table) memecah tabel seketika di posisi kursor berada.' },
+        { cat:'WORD', level:'medium', weight:3, q:'Menu untuk melihat struktur judul bab (Heading) laporan di sisi kiri layar untuk navigasi cepat adalah...', o:['View > Draft', 'View > Navigation Pane', 'View > Outline', 'Review > Navigation Pane', 'Insert > Navigation Bar'], a:'b', exp: '"Navigation Pane" bertindak sebagai peta jalan dokumen untuk perpindahan antar bab secara instan.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Cara memberikan jarak (padding) antara teks dan garis tepi di seluruh sel tabel secara otomatis adalah...', o:['Menekan spasi manual.', 'Mengatur "Line Spacing" di dalam tabel.', 'Klik kanan tabel > Table Properties > Tab Cell > Options > atur Cell Margins.', 'Layout > grup Alignment > Cell Margins.', 'Jawaban C dan D benar.'], a:'e', exp: '"Cell Margins" mengatur ruang kosong di dalam sel agar teks laporan tidak terlihat sesak.' },
+        { cat:'WORD', level:'hard', weight:4, q:'Fitur paragraf agar sebuah judul bab tidak pernah tertinggal sendirian di akhir halaman (selalu menempel ke paragraf bawah) adalah...', o:['Widow/Orphan control', 'Keep with next', 'Keep lines together', 'Page break before', 'Hanging indent'], a:'b', exp: '"Keep with next" memastikan paragraf terpilih selalu berada di halaman yang sama dengan paragraf berikutnya.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Unit siber ingin menghapus metadata dokumen (nama pemilik PC, waktu total pengeditan) sebelum disebarkan ke publik. Fitur yang digunakan adalah...', o:['Protect Document', 'Inspect Document', 'Accept All Changes', 'Proofing Tool', 'Draft Mode'], a:'b', exp: '"Inspect Document" adalah audit keamanan untuk membersihkan informasi pribadi tersembunyi dalam file.' },
+        { cat:'WORD', level:'medium', weight:3, q:'Operator ingin memasukkan diagram alur penangkapan tersangka yang profesional dan mudah diubah warnanya. Menu paling tepat adalah...', o:['Insert Icons', 'Insert Shapes', 'Insert SmartArt', 'Insert Chart', 'Insert 3D Models'], a:'c', exp: 'SmartArt menyediakan template diagram alur dan struktur organisasi siap pakai.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Teknik "Paste" agar data tabel di Word otomatis berubah mengikuti jika ada perubahan data pada file sumber di Excel adalah...', o:['Normal Paste', 'Paste as Picture', 'Paste Link', 'Paste as HTML', 'Keep Text Only'], a:'c', exp: 'Paste Link menciptakan hubungan dinamis antara file sumber (Excel) dan file tujuan (Word).' },
+        { cat:'WORD', level:'hard', weight:4, q:'Penulisan draf Perkap mengharuskan baris kedua paragraf menonjol ke dalam. Pengaturan ini disebut...', o:['First Line Indent', 'Hanging Indent', 'Left Indent', 'Right Indent', 'Mirror Indent'], a:'b', exp: 'Hanging Indent memposisikan baris pertama di margin dan baris sisanya menjorok ke dalam.' },
+        { cat:'WORD', level:'easy', weight:1, q:'Sebelum meninggalkan meja kerja, operator wajib mengunci komputer (Lock) demi keamanan data. Shortcutnya adalah...', o:['Win + L', 'Ctrl + S', 'Alt + F4', 'Ctrl + Alt + Del', 'Win + E'], a:'a', exp: 'Shortcut Windows + L secara instan mengunci perangkat komputer.' },
+        { cat:'WORD', level:'medium', weight:3, q:'Operator ingin memberi efek bayangan dan pantulan pada judul laporan agar terlihat eksklusif. Menu yang digunakan adalah...', o:['WordArt', 'Text Effects and Typography', 'Font Styles', 'Shading', 'Format Painter'], a:'b', exp: 'Ikon Text Effects (A bercahaya) memberikan sentuhan estetika tipografi modern.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Teks di bawah selalu terpotong saat diprint ke kertas F4. Solusi pengaturan yang benar di Page Setup adalah...', o:['Ukuran kertas Legal', 'Ukuran kertas A4', 'Custom Size: 21.5 x 33 cm', 'Ganti Printer', 'Kecilkan Margin'], a:'c', exp: 'Kertas F4/Folio harus diatur manual (Custom Size) karena tidak standar internasional.' },
+        { cat:'WORD', level:'medium', weight:3, q:'Agar gambar logo tidak menghalangi teks instruksi (teks berada di atas gambar), pilihan Wrap Text-nya adalah...', o:['Square', 'Tight', 'Behind Text', 'In Front of Text', 'Through'], a:'c', exp: 'Behind Text menaruh objek gambar di layer paling bawah di belakang teks.' },
+        { cat:'WORD', level:'hard', weight:5, q:'Jika file naskah dinas tidak bisa dibuka normal (corrupt), fitur troubleshooting internal Word yang digunakan adalah...', o:['Hapus file', 'Buka via Notepad', 'File > Open > pilih file > Open and Repair', 'Instal ulang Word', 'Ganti laptop'], a:'c', exp: '"Open and Repair" adalah fitur pemulihan struktur file Word yang rusak.' },
+        { cat:'WORD', level:'medium', weight:2, q:'Shortcut keyboard tercepat untuk memposisikan judul laporan tepat di tengah halaman (Center) adalah...', o:['Ctrl + L', 'Ctrl + R', 'Ctrl + J', 'Ctrl + E', 'Ctrl + T'], a:'d', exp: 'Ctrl + E adalah shortcut perataan teks ke tengah (Center).'}
+    ];
+
+    // FUNGSI MENGACAK PILIHAN JAWABAN (Posisi A,B,C,D,E berubah)
+    function shuffleOptions() {
+        questions.forEach(q => {
+            const correctText = q.o[q.a.charCodeAt(0) - 97];
+            q.o.sort(() => Math.random() - 0.5);
+            q.a = String.fromCharCode(97 + q.o.indexOf(correctText));
+        });
+    }
+
+    let currentIdx = 0;
+    const expiredDate = "2028-07-01";
+
+    function startQuiz() {
+        const today = new Date().toISOString().split('T')[0];
+        if (today > expiredDate) { alert("Masa berlaku link telah berakhir."); return; }
+        const name = document.getElementById('userNameInput').value.trim();
+        if (!name) { alert("Masukkan Nama Lengkap!"); return; }
+        pesertaName = name;
+        document.getElementById('login-overlay').style.display = 'none';
+        
+        // --- SOAL TIDAK DIACAK LAGI AGAR URUT 1-50 ---
+        
+        shuffleOptions(); // Pilihan jawaban tetap acak agar menantang
+        initQuiz();
+    }
+
+    function initQuiz() {
+        const container = document.getElementById('soalContainer');
+        const grid = document.getElementById('gridNav');
+        container.innerHTML = "";
+        grid.innerHTML = "";
+        questions.forEach((s, i) => {
+            const div = document.createElement('div');
+            div.className = 'q-wrapper';
+            div.id = `q${i}`;
+            let opts = s.o.map((opt, idx) => {
+                const char = String.fromCharCode(97 + idx);
+                return `<label><input type="radio" name="ans${i}" value="${char}" onchange="hAns(${i})"> ${char.toUpperCase()}. ${opt}</label>`;
+            }).join('');
+            div.innerHTML = `<div class="q-text">${i+1}. ${s.q}</div><div class="options">${opts}</div>`;
+            container.appendChild(div);
+
+            const btn = document.createElement('button');
+            btn.id = `nav${i}`; btn.innerText = i + 1;
+            btn.onclick = () => jump(i);
+            grid.appendChild(btn);
+        });
+        showSoal(0);
+    }
+
+    function hAns(idx) {
+        document.getElementById(`nav${idx}`).classList.add('done');
+        if (currentIdx < questions.length - 1) setTimeout(() => { move(1); }, 400);
+    }
+
+    function showSoal(idx) {
+        document.querySelectorAll('.q-wrapper').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById(`q${idx}`);
+        if(target) target.classList.add('active');
+        
+        document.querySelectorAll('.nav-grid button').forEach(el => el.classList.remove('current'));
+        const navBtn = document.getElementById(`nav${idx}`);
+        if(navBtn) navBtn.classList.add('current');
+        
+        document.getElementById('prevBtn').disabled = (idx === 0);
+        document.getElementById('nextBtn').innerText = (idx === questions.length - 1) ? "SELESAI" : "LANJUT";
+        currentIdx = idx;
+    }
+
+    function move(step) {
+        if (currentIdx === questions.length - 1 && step === 1) { finishQuiz(); return; }
+        showSoal(currentIdx + step);
+    }
+
+    function jump(idx) { showSoal(idx); }
+
+    function finishQuiz() {
+        if (!confirm("Akhiri simulasi sekarang?")) return;
+        let sc = 0;
+        const b = document.getElementById('rekapBody');
+        b.innerHTML = "";
+        questions.forEach((s, i) => {
+            const sel = document.querySelector(`input[name="ans${i}"]:checked`);
+            const u = sel ? sel.value : null;
+            const isC = (u === s.a); if (isC) sc++;
+            const uT = u ? s.o[u.charCodeAt(0) - 97] : "-";
+            const cT = s.o[s.a.charCodeAt(0) - 97];
+            const r = b.insertRow();
+            r.innerHTML = `<td>${i+1}</td><td><strong>KASUS:</strong> ${s.q}<br><small>Jawaban: (${u?u.toUpperCase():'-'}) ${uT} | Kunci: (${s.a.toUpperCase()}) ${cT}<br><em>Analis: ${s.exp}</em></small></td><td class="${isC?'status-benar':'status-salah'}">${isC?'BENAR':'SALAH'}</td>`;
+        });
+        const fS = (sc / questions.length) * 100;
+        document.getElementById('scoreText').innerText = fS.toFixed(0);
+        document.getElementById('displayUserName').innerText = pesertaName.toUpperCase();
+        document.getElementById('soalContainer').style.display = 'none';
+        document.getElementById('navFooter').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        window.scrollTo(0,0);
+    }
+
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("HASIL UJI KOMPUTER MS WORD - PERSONA RESEARCH & CONSULTING", 10, 15);
+        doc.text("Nama: " + pesertaName.toUpperCase() + " | Skor: " + document.getElementById('scoreText').innerText, 10, 25);
+        const rs = [];
+        questions.forEach((s, i) => {
+            const sel = document.querySelector(`input[name="ans${i}"]:checked`);
+            const isC = (sel && sel.value === s.a);
+            rs.push([i+1, s.q.substring(0, 50) + "...", isC ? "BENAR" : "SALAH"]);
+        });
+        doc.autoTable({ startY: 35, head: [['No', 'Kasus', 'Status']], body: rs });
+        doc.save(`Hasil_TKK_WORD_${pesertaName}.pdf`);
+    }
+</script>
+</body>
+</html>

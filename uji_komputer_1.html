@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMULASI CAT TKK KOMPUTER – MICROSOFT OFFICE & ADMINISTRASI DIGITAL 1 - Persona Research & Consulting</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root { --gold: #D4AF37; --ivory: #FFFFF0; --black: #000000; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--ivory); color: var(--black); margin: 0; padding: 10px; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; user-select: none; -webkit-user-select: none; }
+        .container { max-width: 900px; background: white; margin: auto; padding: 25px; border-radius: 10px; border-top: 8px solid var(--black); box-shadow: 0 4px 20px rgba(0,0,0,0.15); flex: 1; display: flex; flex-direction: column; }
+        .header { text-align: center; border-bottom: 3px double var(--gold); margin-bottom: 20px; padding-bottom: 15px; }
+        .header h2 { margin: 0; font-size: 1.4em; font-weight: 900; text-transform: uppercase; color: var(--black); letter-spacing: 1px; }
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-box { background: white; padding: 50px 60px; border-radius: 15px; text-align: center; border-top: 8px solid var(--gold); width: 95%; max-width: 750px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .login-box h2 { font-size: 1.8em; margin-bottom: 10px; white-space: nowrap; }
+        .login-box input { width: 100%; padding: 18px; margin: 25px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 1.2em; text-align: center; font-weight: bold; }
+        .q-wrapper { display: none; width: 100%; }
+        .q-wrapper.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .q-text { color: #1a1a1a; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; border-left: 5px solid var(--gold); padding-left: 15px; text-align: justify; }
+        .options { display: grid; gap: 10px; }
+        .options label { display: flex; align-items: center; padding: 15px; background: #f9f9f9; border: 1.5px solid #eee; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .options label:hover { background: #fffcf0; border-color: var(--gold); }
+        .options input { margin-right: 15px; transform: scale(1.4); accent-color: var(--black); }
+        .nav-footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; }
+        .nav-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-bottom: 20px; }
+        .nav-grid button { padding: 8px 0; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 5px; }
+        .nav-grid button.done { background: var(--black); color: white; }
+        .nav-grid button.current { border: 2px solid var(--gold); font-weight: bold; }
+        .btn-action { background: var(--black); color: white; border: none; padding: 18px 40px; font-weight: bold; cursor: pointer; border-radius: 8px; text-transform: uppercase; transition: 0.3s; font-size: 1.1em; }
+        .btn-action:hover { background: var(--gold); }
+        #result-area { display: none; text-align: center; }
+        .score-val { font-size: 5em; font-weight: 900; color: var(--black); }
+        .rekap-table { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 0.85em; text-align: left; }
+        .rekap-table th, .rekap-table td { border: 1px solid #ddd; padding: 12px; }
+        .status-benar { color: green; font-weight: bold; }
+        .status-salah { color: red; font-weight: bold; }
+        .page-footer { text-align: center; padding: 20px; font-size: 0.9em; color: var(--black); font-weight: bold; }
+    </style>
+</head>
+<body oncontextmenu="return false" oncopy="return false" oncut="return false" onkeydown="return (event.keyCode != 123)">
+
+<div id="login-overlay">
+    <div class="login-box">
+        <h2 style="margin:0;">PERSONA RESEARCH & CONSULTING</h2>
+        <h3 style="color: var(--gold); margin-top:10px; letter-spacing: 2px;">SIMULASI UJI KOMPUTER</h3>
+        <p style="font-size: 1.1em;">MICROSOFT OFFICE & ADMINISTRASI DIGITAL 1</p>
+        <input type="text" id="userNameInput" placeholder="MASUKKAN NAMA LENGKAP PESERTA..." autocomplete="off">
+        <button class="btn-action" onclick="startQuiz()">MULAI SIMULASI</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h2>PERSONA RESEARCH & CONSULTING</h2>
+        <small style="color: var(--gold); font-weight: bold; letter-spacing: 1px;">MICROSOFT OFFICE & ADMINISTRASI DIGITAL 1</small>
+    </div>
+
+    <form id="quizForm">
+        <div id="soalContainer"></div>
+        <div id="result-area">
+            <h3 id="displayUserName" style="color:var(--gold);"></h3>
+            <h2>SKOR AKHIR ANDA</h2>
+            <div class="score-val" id="scoreText">0</div>
+            <button type="button" class="btn-action" onclick="downloadPDF()">UNDUH HASIL (PDF)</button>
+            <div style="overflow-x: auto;">
+                <table class="rekap-table">
+                    <thead><tr><th>No</th><th>Analisis Situasi & Pembahasan Mendalam</th><th>Status</th></tr></thead>
+                    <tbody id="rekapBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+
+    <div class="nav-footer" id="navFooter">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <button class="btn-action" id="prevBtn" onclick="move(-1)" disabled>KEMBALI</button>
+            <button class="btn-action" id="nextBtn" onclick="move(1)">LANJUT</button>
+        </div>
+        <div class="nav-grid" id="gridNav"></div>
+    </div>
+</div>
+
+<footer class="page-footer">Persona Research & Consulting | Hotline: 0877 4251 5786</footer>
+
+<script>
+    let pesertaName = "";
+    
+    let questions = [
+        {
+            cat:'WORD',
+            level:'hard',
+            weight:5,
+            q:'Pada pukul 06.50 WIB operator administrasi sebuah satuan menerima instruksi mendadak untuk memperbaiki laporan kronologis kejadian yang akan dipaparkan pada rapat evaluasi pagi. Dokumen tersebut sebelumnya diketik oleh operator malam menggunakan font khusus instansi. Ketika file dibuka di ruang paparan menggunakan laptop cadangan, seluruh struktur halaman berubah: tabel melebar, jumlah halaman bertambah dari 18 menjadi 26 halaman, dan beberapa tanda tangan digital berpindah posisi. Pimpinan meminta tampilan dokumen harus identik tanpa menginstal ulang font di perangkat rapat karena waktu tinggal 7 menit sebelum presentasi dimulai. Langkah paling tepat dan profesional adalah...',
+            o:[
+                'Mengubah seluruh font menjadi Arial agar kompatibel di semua perangkat.',
+                'Menyimpan file menggunakan format Rich Text Format (RTF).',
+                'Mengaktifkan fitur Embed Fonts in the File melalui Word Options sebelum file dikirim.',
+                'Mengubah ukuran margin agar jumlah halaman kembali normal.',
+                'Melakukan screenshot setiap halaman lalu menyusunnya kembali di Word.'
+            ],
+            a:'c',
+            exp:'Fitur Embed Fonts memungkinkan jenis huruf ikut tersimpan di dalam file sehingga tampilan tetap identik walaupun komputer lain tidak memiliki font tersebut.'
+        },
+        {
+            cat:'WORD',
+            level:'hard',
+            weight:5,
+            q:'Seorang operator sedang menyusun dokumen rencana operasi lapangan setebal lebih dari 200 halaman. Pada halaman tertentu terdapat peta wilayah yang harus ditampilkan melebar (Landscape), sementara seluruh halaman lainnya wajib tetap Portrait sesuai standar administrasi. Ketika operator langsung mengganti orientation menjadi Landscape, seluruh dokumen berubah ikut melebar sehingga format rusak dan nomor halaman bergeser. Langkah teknis paling benar agar hanya satu halaman yang berubah orientasi adalah...',
+            o:[
+                'Membuat file baru khusus untuk halaman peta.',
+                'Menisipkan Section Break sebelum dan sesudah halaman tersebut lalu mengubah orientation pada section terkait.',
+                'Menggunakan fitur Columns agar halaman tampak melebar.',
+                'Mengubah ukuran kertas menjadi Legal.',
+                'Menggeser margin kiri dan kanan secara manual.'
+            ],
+            a:'b',
+            exp:'Section Break memisahkan format antarbagian dokumen sehingga orientation dapat diubah tanpa mempengaruhi halaman lain.'
+        },
+        {
+            cat:'WORD',
+            level:'medium',
+            weight:3,
+            q:'Saat proses finalisasi laporan hasil kegiatan lapangan, operator menemukan banyak spasi ganda akibat hasil copy-paste dari aplikasi pesan instan. Dokumen harus dicetak dalam waktu singkat dan tidak mungkin diperiksa satu per satu secara manual. Cara tercepat dan paling efisien untuk merapikan seluruh spasi ganda menjadi satu spasi normal adalah...',
+            o:[
+                'Menggunakan tombol Backspace pada setiap kata yang bermasalah.',
+                'Melakukan copy ulang seluruh teks ke Notepad.',
+                'Menggunakan fitur Find and Replace dengan mengganti dua spasi menjadi satu spasi.',
+                'Mengubah alignment menjadi Justify.',
+                'Menurunkan ukuran font menjadi 10.'
+            ],
+            a:'c',
+            exp:'Ctrl + H dapat digunakan untuk mengganti karakter secara massal termasuk spasi ganda.'
+        },
+        {
+            cat:'WORD',
+            level:'hard',
+            weight:4,
+            q:'Operator bagian SDM sedang menyusun daftar peserta seleksi yang terdiri dari ratusan nama dan tersebar ke banyak halaman. Pimpinan meminta agar judul kolom seperti Nama, Nomor Peserta, Nilai, dan Keterangan tetap muncul otomatis di setiap halaman saat dicetak agar pembaca tidak bingung membaca tabel panjang tersebut. Solusi paling tepat adalah...',
+            o:[
+                'Mengetik ulang judul kolom pada setiap halaman.',
+                'Membuat tabel terpisah per halaman.',
+                'Mengaktifkan fitur Repeat Header Rows pada baris judul tabel.',
+                'Mengubah orientasi halaman menjadi Landscape.',
+                'Menambahkan Page Break manual setiap halaman.'
+            ],
+            a:'c',
+            exp:'Repeat Header Rows membuat baris judul tabel tampil otomatis pada setiap halaman lanjutan.'
+        },
+        {
+            cat:'WORD',
+            level:'hard',
+            weight:5,
+            q:'Dalam penyusunan berita acara pemeriksaan, operator diminta membuat kutipan keterangan saksi tampak menjorok dari sisi kiri dan kanan agar berbeda dari narasi utama pemeriksa. Operator awalnya menggunakan tombol spasi berkali-kali, namun saat ukuran font berubah seluruh posisi menjadi berantakan. Cara profesional untuk membuat format kutipan tetap stabil adalah...',
+            o:[
+                'Menggunakan tombol Tab di setiap awal baris.',
+                'Mengatur Left dan Right Indent pada menu Paragraph.',
+                'Menekan tombol spasi hingga posisi terlihat pas.',
+                'Menggunakan fitur Center Alignment.',
+                'Memasukkan kutipan ke dalam tabel.'
+            ],
+            a:'b',
+            exp:'Indentasi paragraf menjaga posisi teks tetap konsisten walaupun font atau margin berubah.'
+        },
+        {
+            cat:'SHORTCUT',
+            level:'easy',
+            weight:1,
+            q:'Seorang operator sedang mengetik laporan panjang dan ingin menyimpan file dengan cepat tanpa membuka menu File. Shortcut keyboard paling tepat adalah...',
+            o:[
+                'Ctrl + P',
+                'Ctrl + S',
+                'Ctrl + O',
+                'Ctrl + A',
+                'Alt + F4'
+            ],
+            a:'b',
+            exp:'Ctrl + S digunakan untuk menyimpan dokumen secara cepat.'
+        },
+        {
+            cat:'KOMPUTER',
+            level:'medium',
+            weight:3,
+            q:'Pada saat proses penginputan data pelayanan masyarakat, komputer operator tiba-tiba melambat drastis setelah banyak aplikasi dibuka secara bersamaan. Setelah diperiksa, penggunaan RAM mencapai hampir 100%. Fungsi utama RAM dalam komputer adalah...',
+            o:[
+                'Menyimpan data permanen seperti harddisk.',
+                'Menghubungkan komputer ke internet.',
+                'Menyimpan data sementara saat aplikasi berjalan.',
+                'Mengolah tampilan grafis monitor.',
+                'Mengatur suplai listrik motherboard.'
+            ],
+            a:'c',
+            exp:'RAM adalah memori sementara yang digunakan sistem saat menjalankan aplikasi dan proses aktif.'
+        },
+        {
+            cat:'BINER',
+            level:'medium',
+            weight:3,
+            q:'Dalam pelatihan dasar komputer digital dijelaskan bahwa seluruh data di dalam sistem komputer sebenarnya diterjemahkan menjadi angka biner. Jika sebuah angka biner 101101 dikonversi ke desimal, maka hasilnya adalah...',
+            o:[
+                '43',
+                '45',
+                '47',
+                '51',
+                '53'
+            ],
+            a:'b',
+            exp:'101101 = 32 + 8 + 4 + 1 = 45.'
+        },
+        {
+            cat:'INTERNET',
+            level:'medium',
+            weight:3,
+            q:'Operator sedang mengirim laporan penting melalui email dinas namun koneksi tiba-tiba terputus. Setelah dicek, ikon jaringan menunjukkan status connected tetapi halaman web tidak dapat dibuka. Perangkat yang paling mungkin bermasalah pada jaringan lokal adalah...',
+            o:[
+                'Monitor',
+                'Printer',
+                'Router atau modem internet',
+                'Keyboard',
+                'Scanner'
+            ],
+            a:'c',
+            exp:'Router atau modem bertugas menghubungkan jaringan lokal dengan internet.'
+        },
+        {
+            cat:'EXCEL',
+            level:'hard',
+            weight:5,
+            q:'Seorang operator sedang mengolah data nilai ratusan peserta seleksi menggunakan Microsoft Excel. Pimpinan meminta agar peserta dengan nilai tertinggi otomatis muncul di urutan paling atas tanpa mengubah struktur data lain. Fitur paling tepat digunakan adalah...',
+            o:[
+                'Freeze Panes',
+                'Sort Descending',
+                'Wrap Text',
+                'Merge Cells',
+                'Conditional Formatting'
+            ],
+            a:'b',
+            exp:'Sort Descending mengurutkan data dari nilai terbesar ke terkecil.'
+        },
+        {
+            cat:'POWERPOINT',
+            level:'medium',
+            weight:3,
+            q:'Saat persiapan paparan evaluasi mingguan, operator diminta membuat perpindahan antar slide terlihat profesional namun tetap ringan agar tidak membebani laptop ruang rapat yang spesifikasinya rendah. Fitur yang digunakan untuk perpindahan antar slide adalah...',
+            o:[
+                'Animation',
+                'Transition',
+                'Layout',
+                'SmartArt',
+                'Hyperlink'
+            ],
+            a:'b',
+            exp:'Transition digunakan untuk efek perpindahan antar slide presentasi.'
+        },
+        {
+            cat:'BINER',
+            level:'hard',
+            weight:4,
+            q:'Sebuah sistem keamanan digital menjelaskan bahwa 1 Byte terdiri dari kumpulan bit yang diproses komputer. Jumlah bit dalam 1 Byte adalah...',
+            o:[
+                '2 bit',
+                '4 bit',
+                '6 bit',
+                '8 bit',
+                '16 bit'
+            ],
+            a:'d',
+            exp:'1 Byte terdiri dari 8 bit.'
+        },
+        {
+            cat:'WORD',
+            level:'hard',
+            weight:5,
+            q:'Pada saat penyusunan laporan kegiatan gabungan lintas fungsi, operator menerima file dari beberapa unit berbeda yang seluruhnya memiliki format tabel dan jenis huruf tidak seragam. Pimpinan meminta seluruh dokumen tampak identik tanpa harus mengatur ulang format satu per satu secara manual. Cara tercepat untuk menyalin format teks dari satu bagian ke bagian lain di Microsoft Word adalah...',
+            o:[
+                'Ctrl + V',
+                'Format Painter',
+                'Save As',
+                'Find and Replace',
+                'Paste Special'
+            ],
+            a:'b',
+            exp:'Format Painter digunakan untuk menyalin format teks tanpa ikut menyalin isi teksnya.'
+        },
+        {
+            cat:'EXCEL',
+            level:'hard',
+            weight:5,
+            q:'Operator bagian administrasi sedang merekap anggaran kegiatan dari beberapa wilayah. Karena jumlah data sangat besar, pimpinan meminta agar nilai total otomatis berubah setiap kali angka baru dimasukkan tanpa perlu dihitung manual ulang. Rumus Excel paling tepat untuk menjumlahkan seluruh data dalam satu kolom adalah...',
+            o:[
+                '=COUNT()',
+                '=AVERAGE()',
+                '=SUM()',
+                '=MAX()',
+                '=IF()'
+            ],
+            a:'c',
+            exp:'Fungsi SUM digunakan untuk menjumlahkan data numerik secara otomatis.'
+        },
+        {
+            cat:'KOMPUTER',
+            level:'medium',
+            weight:3,
+            q:'Dalam proses pemeriksaan perangkat komputer operasional, teknisi menjelaskan bahwa CPU sering disebut sebagai otak komputer karena bertugas melakukan pemrosesan instruksi dan pengolahan data utama. Kepanjangan dari CPU adalah...',
+            o:[
+                'Central Process Unit',
+                'Central Processing Unit',
+                'Computer Primary Unit',
+                'Control Program Utility',
+                'Central Program Usage'
+            ],
+            a:'b',
+            exp:'CPU merupakan singkatan dari Central Processing Unit.'
+        },
+        {
+            cat:'SHORTCUT',
+            level:'easy',
+            weight:1,
+            q:'Saat mengetik laporan panjang, operator tidak sengaja menghapus satu paragraf penting. Untuk mengembalikan tindakan terakhir dengan cepat tanpa menggunakan mouse, shortcut yang digunakan adalah...',
+            o:[
+                'Ctrl + Y',
+                'Ctrl + U',
+                'Ctrl + Z',
+                'Ctrl + P',
+                'Ctrl + Shift + Z'
+            ],
+            a:'c',
+            exp:'Ctrl + Z berfungsi untuk Undo atau membatalkan tindakan terakhir.'
+        },
+        {
+            cat:'BINER',
+            level:'hard',
+            weight:4,
+            q:'Dalam pelatihan sistem digital dijelaskan bahwa bilangan biner hanya mengenal dua angka yaitu 0 dan 1. Jika angka desimal 13 diubah ke bentuk biner, maka hasil yang benar adalah...',
+            o:[
+                '1010',
+                '1101',
+                '1110',
+                '1001',
+                '1011'
+            ],
+            a:'b',
+            exp:'13 dalam biner adalah 1101 karena 8 + 4 + 1 = 13.'
+        },
+        {
+            cat:'WORD',
+            level:'hard',
+            weight:5,
+            q:'Operator sedang menyusun dokumen dengan banyak revisi dari pimpinan. Agar seluruh perubahan seperti penghapusan kata, penambahan kalimat, dan koreksi format dapat terlihat jelas oleh pemeriksa berikutnya, operator harus mengaktifkan fitur...',
+            o:[
+                'Protect Document',
+                'Track Changes',
+                'Compare Document',
+                'Inspect Document',
+                'Restrict Editing'
+            ],
+            a:'b',
+            exp:'Track Changes merekam seluruh perubahan yang dilakukan dalam dokumen.'
+        },
+        {
+            cat:'POWERPOINT',
+            level:'medium',
+            weight:3,
+            q:'Saat melakukan presentasi evaluasi situasi lapangan, operator ingin menampilkan slide satu per satu secara penuh layar kepada pimpinan. Tombol keyboard tercepat untuk memulai Slide Show dari awal adalah...',
+            o:[
+                'F1',
+                'F5',
+                'F7',
+                'Ctrl + P',
+                'Alt + Enter'
+            ],
+            a:'b',
+            exp:'F5 digunakan untuk memulai presentasi PowerPoint dari slide pertama.'
+        },
+        {
+            cat:'INTERNET',
+            level:'medium',
+            weight:3,
+            q:'Operator sedang mengakses sistem pelaporan online namun halaman tidak dapat dibuka karena browser menyimpan cache lama sehingga tampilan tidak diperbarui. Cara tercepat melakukan refresh penuh halaman web adalah...',
+            o:[
+                'Ctrl + C',
+                'Ctrl + Shift + R',
+                'Ctrl + V',
+                'Alt + F4',
+                'Ctrl + A'
+            ],
+            a:'b',
+            exp:'Ctrl + Shift + R melakukan hard refresh dengan memuat ulang data terbaru dari server.'
+        },
+        {
+            cat:'WORD',
+            level:'hard',
+            weight:5,
+            q:'Dalam proses pencetakan laporan penting, operator menemukan bahwa nomor halaman pada lembar sampul tidak boleh muncul, sedangkan halaman berikutnya tetap harus dimulai dari nomor 2 sesuai standar administrasi. Pengaturan yang paling tepat digunakan adalah...',
+            o:[
+                'Link to Previous',
+                'Different First Page',
+                'Insert Citation',
+                'Page Border',
+                'Columns'
+            ],
+            a:'b',
+            exp:'Different First Page memungkinkan halaman pertama memiliki header dan footer berbeda.'
+        },
+        {
+            cat:'EXCEL',
+            level:'hard',
+            weight:5,
+            q:'Operator sedang membuat laporan keuangan bulanan dan ingin agar sel berwarna merah otomatis muncul jika nilai pengeluaran melebihi batas tertentu. Fitur Excel yang digunakan adalah...',
+            o:[
+                'Data Validation',
+                'Conditional Formatting',
+                'Protect Sheet',
+                'Freeze Panes',
+                'Sort A-Z'
+            ],
+            a:'b',
+            exp:'Conditional Formatting digunakan untuk memberikan format otomatis berdasarkan kondisi tertentu.'
+        },
+        {
+            cat:'BINER',
+            level:'hard',
+            weight:4,
+            q:'Sebuah perangkat digital membaca kode biner 1111. Jika dikonversi ke desimal, hasilnya adalah...',
+            o:[
+                '12',
+                '13',
+                '14',
+                '15',
+                '16'
+            ],
+            a:'d',
+            exp:'1111 biner = 8 + 4 + 2 + 1 = 15.'
+        },
+        {
+            cat:'KOMPUTER',
+            level:'medium',
+            weight:3,
+            q:'Dalam struktur perangkat komputer modern, perangkat yang berfungsi menyimpan data secara permanen meskipun komputer dimatikan adalah...',
+            o:[
+                'RAM',
+                'Processor',
+                'Harddisk atau SSD',
+                'Cache Memory',
+                'Power Supply'
+            ],
+            a:'c',
+            exp:'Harddisk dan SSD merupakan media penyimpanan permanen.'
+        },
+        {
+            cat:'SHORTCUT',
+            level:'easy',
+            weight:1,
+            q:'Shortcut keyboard untuk mencetak dokumen secara cepat tanpa membuka menu File adalah...',
+            o:[
+                'Ctrl + P',
+                'Ctrl + O',
+                'Ctrl + N',
+                'Ctrl + Shift + P',
+                'Alt + P'
+            ],
+            a:'a',
+            exp:'Ctrl + P digunakan untuk membuka menu print secara instan.'
+        }
+,
+        {
+            cat:'WORD',
+            level:'hard',
+            weight:5,
+            q:'Operator administrasi sedang menyusun laporan gabungan yang memiliki daftar isi lebih dari 15 halaman. Pimpinan meminta agar nomor halaman pada daftar isi dapat diklik langsung dan berpindah otomatis ke bab terkait saat file dibuka dalam bentuk PDF digital. Langkah paling tepat agar fungsi tersebut berjalan otomatis adalah...',
+            o:[
+                'Mengetik nomor halaman manual.',
+                'Menggunakan Heading Style dan Table of Contents otomatis.',
+                'Membuat hyperlink satu per satu secara manual.',
+                'Mengubah file menjadi gambar.',
+                'Menggunakan tab leader titik-titik biasa.'
+            ],
+            a:'b',
+            exp:'Heading Style dan Table of Contents otomatis memungkinkan navigasi aktif saat diekspor ke PDF.'
+        },
+        {
+            cat:'EXCEL',
+            level:'hard',
+            weight:5,
+            q:'Dalam pengolahan data hasil pemeriksaan lapangan, operator ingin agar baris paling atas tetap terlihat saat tabel panjang di-scroll ke bawah sehingga judul kolom tidak hilang. Fitur yang paling tepat digunakan adalah...',
+            o:[
+                'Wrap Text',
+                'Freeze Panes',
+                'Conditional Formatting',
+                'Merge Cells',
+                'Data Validation'
+            ],
+            a:'b',
+            exp:'Freeze Panes menjaga bagian tertentu tetap terlihat saat lembar kerja digulir.'
+        },
+        {
+            cat:'BINER',
+            level:'hard',
+            weight:4,
+            q:'Dalam simulasi logika digital dijelaskan bahwa komputer bekerja menggunakan sistem bit. Jika terdapat bilangan biner 100000, maka nilai desimalnya adalah...',
+            o:[
+                '16',
+                '24',
+                '30',
+                '32',
+                '64'
+            ],
+            a:'d',
+            exp:'100000 biner bernilai 32 dalam desimal.'
+        },
+        {
+            cat:'KOMPUTER',
+            level:'medium',
+            weight:3,
+            q:'Pada saat pemeriksaan perangkat komputer operasional, teknisi menjelaskan bahwa perangkat input digunakan untuk memasukkan data ke komputer. Yang termasuk perangkat input adalah...',
+            o:[
+                'Monitor',
+                'Printer',
+                'Speaker',
+                'Keyboard',
+                'Projector'
+            ],
+            a:'d',
+            exp:'Keyboard merupakan perangkat input untuk memasukkan data dan perintah.'
+        },
+        {
+            cat:'SHORTCUT',
+            level:'easy',
+            weight:1,
+            q:'Operator ingin menyeleksi seluruh isi dokumen secara cepat sebelum mengganti ukuran huruf. Shortcut keyboard yang digunakan adalah...',
+            o:[
+                'Ctrl + S',
+                'Ctrl + A',
+                'Ctrl + C',
+                'Ctrl + E',
+                'Ctrl + P'
+            ],
+            a:'b',
+            exp:'Ctrl + A digunakan untuk memilih seluruh isi dokumen.'
+        },
+        {
+            cat:'POWERPOINT',
+            level:'medium',
+            weight:3,
+            q:'Saat proses presentasi evaluasi kegiatan, operator ingin menampilkan video singkat langsung di dalam slide tanpa harus membuka aplikasi lain. Menu yang digunakan untuk memasukkan video ke PowerPoint adalah...',
+            o:[
+                'Insert > Video',
+                'Home > Layout',
+                'Design > Theme',
+                'Transition > Morph',
+                'View > Notes'
+            ],
+            a:'a',
+            exp:'Fitur Insert > Video digunakan untuk menyisipkan file video ke dalam slide.'
+        },
+        {
+            cat:'WORD',
+            level:'hard',
+            weight:5,
+            q:'Dalam proses penyusunan surat resmi, operator ingin membuat titik-titik daftar isi atau formulir tetap lurus dan rapi walaupun panjang teks berbeda-beda. Teknik paling profesional adalah...',
+            o:[
+                'Menekan tombol spasi berulang kali.',
+                'Menggunakan tombol Tab biasa.',
+                'Menggunakan Tabs dengan Leader.',
+                'Membuat tabel tanpa border.',
+                'Menggunakan underline manual.'
+            ],
+            a:'c',
+            exp:'Tabs dengan Leader menghasilkan titik-titik yang lurus dan otomatis mengikuti margin.'
+        },
+        {
+            cat:'INTERNET',
+            level:'medium',
+            weight:3,
+            q:'Operator menerima email mencurigakan yang meminta memasukkan username dan password akun dinas melalui tautan tertentu. Dalam keamanan siber, metode penipuan seperti ini disebut...',
+            o:[
+                'Scanning',
+                'Defragmentasi',
+                'Phishing',
+                'Booting',
+                'Formatting'
+            ],
+            a:'c',
+            exp:'Phishing adalah upaya penipuan untuk mencuri data akun melalui tautan palsu.'
+        },
+        {
+            cat:'BINER',
+            level:'hard',
+            weight:4,
+            q:'Jika bilangan biner 1010 dijumlahkan dengan bilangan biner 0011, maka hasil binernya adalah...',
+            o:[
+                '1011',
+                '1100',
+                '1101',
+                '1110',
+                '1111'
+            ],
+            a:'c',
+            exp:'1010 (10) + 0011 (3) = 1101 (13).' 
+        },
+        {
+            cat:'EXCEL',
+            level:'hard',
+            weight:5,
+            q:'Operator sedang mengolah data nilai dan ingin agar hasil tulisan LULUS muncul otomatis jika nilai di atas 75, sedangkan di bawah itu muncul TIDAK LULUS. Rumus yang paling tepat digunakan adalah...',
+            o:[
+                '=SUM()',
+                '=MAX()',
+                '=IF()',
+                '=COUNT()',
+                '=AVERAGE()'
+            ],
+            a:'c',
+            exp:'Fungsi IF digunakan untuk logika kondisi tertentu.'
+        },
+        {
+            cat:'WORD',
+            level:'hard',
+            weight:5,
+            q:'Saat mengetik laporan panjang, operator ingin memindahkan satu paragraf ke halaman lain tanpa menggunakan mouse sama sekali. Kombinasi shortcut paling tepat untuk memotong lalu menempel teks adalah...',
+            o:[
+                'Ctrl + C lalu Ctrl + V',
+                'Ctrl + X lalu Ctrl + V',
+                'Ctrl + Z lalu Ctrl + Y',
+                'Ctrl + S lalu Ctrl + P',
+                'Ctrl + B lalu Ctrl + I'
+            ],
+            a:'b',
+            exp:'Ctrl + X memotong teks dan Ctrl + V menempelkan di lokasi baru.'
+        },
+        {
+            cat:'KOMPUTER',
+            level:'medium',
+            weight:3,
+            q:'Perangkat yang berfungsi menampilkan hasil proses komputer secara visual kepada pengguna disebut perangkat...',
+            o:[
+                'Input',
+                'Output',
+                'Processing',
+                'Network',
+                'Storage'
+            ],
+            a:'b',
+            exp:'Perangkat output menampilkan hasil proses komputer kepada pengguna.'
+        },
+        {
+            cat:'SHORTCUT',
+            level:'easy',
+            weight:1,
+            q:'Shortcut keyboard untuk membuat tulisan menjadi tebal (Bold) di Microsoft Word adalah...',
+            o:[
+                'Ctrl + I',
+                'Ctrl + U',
+                'Ctrl + B',
+                'Ctrl + T',
+                'Ctrl + Shift + B'
+            ],
+            a:'c',
+            exp:'Ctrl + B digunakan untuk mengaktifkan format Bold.'
+        },
+        {
+            cat:'WORD',
+            level:'hard',
+            weight:5,
+            q:'Dalam proses finalisasi laporan evaluasi kegiatan, operator diminta menggabungkan beberapa file Word dari unit berbeda menjadi satu dokumen utama tanpa merusak format halaman maupun nomor bab. Cara paling profesional untuk memasukkan isi file lain langsung ke dokumen aktif adalah...',
+            o:[
+                'Copy paste manual seluruh isi dokumen.',
+                'Insert > Object > Text from File.',
+                'Menyimpan ulang semua file menjadi PDF.',
+                'Menggunakan screenshot halaman.',
+                'Membuat dokumen baru lalu mengetik ulang.'
+            ],
+            a:'b',
+            exp:'Text from File memungkinkan isi dokumen lain dimasukkan langsung ke file aktif secara lebih stabil.'
+        },
+        {
+            cat:'BINER',
+            level:'hard',
+            weight:4,
+            q:'Dalam pelajaran logika digital dijelaskan bahwa komputer hanya memahami kondisi hidup dan mati yang diterjemahkan menjadi angka biner. Jika bilangan desimal 25 dikonversi menjadi biner, hasil yang benar adalah...',
+            o:[
+                '11001',
+                '10101',
+                '11100',
+                '10011',
+                '10110'
+            ],
+            a:'a',
+            exp:'25 desimal = 16 + 8 + 1 sehingga menjadi 11001 dalam biner.'
+        },
+        {
+            cat:'EXCEL',
+            level:'hard',
+            weight:5,
+            q:'Operator sedang mengolah data absensi ratusan personel dan ingin agar nama yang sama tidak bisa dimasukkan dua kali pada kolom tertentu. Fitur Excel yang paling tepat digunakan untuk membatasi input data adalah...',
+            o:[
+                'Conditional Formatting',
+                'Data Validation',
+                'Wrap Text',
+                'Filter',
+                'Pivot Table'
+            ],
+            a:'b',
+            exp:'Data Validation digunakan untuk mengatur aturan input agar data tetap valid.'
+        },
+        {
+            cat:'KOMPUTER',
+            level:'medium',
+            weight:3,
+            q:'Dalam struktur perangkat komputer modern, SSD lebih disukai dibanding harddisk biasa karena memiliki kecepatan baca dan tulis data yang jauh lebih tinggi. Kepanjangan dari SSD adalah...',
+            o:[
+                'System Storage Drive',
+                'Solid State Drive',
+                'Secure System Disk',
+                'Serial Storage Data',
+                'Solid System Device'
+            ],
+            a:'b',
+            exp:'SSD adalah singkatan dari Solid State Drive.'
+        },
+        {
+            cat:'WORD',
+            level:'hard',
+            weight:5,
+            q:'Saat mencetak laporan rahasia, operator ingin memastikan tidak ada metadata tersembunyi seperti nama pembuat dokumen atau riwayat revisi yang ikut tersebar ke pihak luar. Fitur yang digunakan untuk memeriksa dan membersihkan data tersembunyi adalah...',
+            o:[
+                'Protect Document',
+                'Inspect Document',
+                'Track Changes',
+                'Restrict Editing',
+                'Compare Document'
+            ],
+            a:'b',
+            exp:'Inspect Document digunakan untuk mendeteksi dan menghapus metadata tersembunyi.'
+        },
+        {
+            cat:'SHORTCUT',
+            level:'easy',
+            weight:1,
+            q:'Shortcut keyboard untuk membuka jendela File Explorer secara cepat di Windows adalah...',
+            o:[
+                'Win + L',
+                'Win + R',
+                'Win + E',
+                'Ctrl + E',
+                'Alt + E'
+            ],
+            a:'c',
+            exp:'Windows + E membuka File Explorer secara instan.'
+        },
+        {
+            cat:'POWERPOINT',
+            level:'medium',
+            weight:3,
+            q:'Operator ingin agar seluruh slide presentasi memiliki desain warna dan jenis huruf yang sama secara otomatis tanpa mengatur satu per satu. Fitur PowerPoint yang paling tepat digunakan adalah...',
+            o:[
+                'Animation Pane',
+                'Slide Sorter',
+                'Theme',
+                'Notes Master',
+                'Insert Object'
+            ],
+            a:'c',
+            exp:'Theme mengatur tampilan keseluruhan presentasi secara konsisten.'
+        },
+        {
+            cat:'BINER',
+            level:'hard',
+            weight:4,
+            q:'Bilangan biner 1001 jika diubah ke desimal akan menghasilkan angka...',
+            o:[
+                '7',
+                '8',
+                '9',
+                '10',
+                '11'
+            ],
+            a:'c',
+            exp:'1001 biner = 8 + 1 = 9.'
+        },
+        {
+            cat:'INTERNET',
+            level:'medium',
+            weight:3,
+            q:'Saat mengakses sistem berbasis web, operator diminta memastikan koneksi aman karena halaman login menggunakan protokol HTTPS. Huruf S pada HTTPS menunjukkan bahwa koneksi tersebut...',
+            o:[
+                'Lebih cepat',
+                'Menggunakan server lokal',
+                'Dilengkapi pengamanan atau enkripsi',
+                'Hanya dapat dibuka di smartphone',
+                'Tidak memerlukan internet'
+            ],
+            a:'c',
+            exp:'HTTPS menggunakan enkripsi SSL/TLS untuk mengamankan pertukaran data.'
+        },
+        {
+            cat:'WORD',
+            level:'hard',
+            weight:5,
+            q:'Operator sedang menyusun laporan dengan banyak gambar dan tabel. Agar posisi gambar tidak mudah bergeser ketika teks ditambah atau dikurangi, pengaturan yang paling stabil adalah...',
+            o:[
+                'Behind Text',
+                'In Front of Text',
+                'In Line with Text',
+                'Tight',
+                'Through'
+            ],
+            a:'c',
+            exp:'In Line with Text memperlakukan gambar seperti karakter teks sehingga posisinya paling stabil.'
+        },
+        {
+            cat:'EXCEL',
+            level:'hard',
+            weight:5,
+            q:'Dalam proses rekap data, operator ingin menyaring hanya data dari wilayah tertentu tanpa menghapus data lain yang ada di tabel. Fitur yang paling tepat digunakan adalah...',
+            o:[
+                'Sort',
+                'Filter',
+                'Wrap Text',
+                'Merge Cells',
+                'Protect Workbook'
+            ],
+            a:'b',
+            exp:'Filter digunakan untuk menampilkan data tertentu sesuai kriteria.'
+        },
+        {
+            cat:'KOMPUTER',
+            level:'medium',
+            weight:3,
+            q:'Perangkat yang berfungsi mencetak dokumen digital menjadi bentuk fisik di atas kertas disebut...',
+            o:[
+                'Scanner',
+                'Projector',
+                'Printer',
+                'Monitor',
+                'Router'
+            ],
+            a:'c',
+            exp:'Printer merupakan perangkat output untuk mencetak dokumen ke media fisik.'
+        }
+    ];
+
+    function shuffleOptions() {
+        questions.forEach(q => {
+            const correctText = q.o[q.a.charCodeAt(0) - 97];
+            q.o.sort(() => Math.random() - 0.5);
+            q.a = String.fromCharCode(97 + q.o.indexOf(correctText));
+        });
+    }
+
+    let currentIdx = 0;
+    const expiredDate = "2028-07-01";
+
+    function startQuiz() {
+        const today = new Date().toISOString().split('T')[0];
+        if (today > expiredDate) { alert("Masa berlaku link telah berakhir."); return; }
+        const name = document.getElementById('userNameInput').value.trim();
+        if (!name) { alert("Masukkan Nama Lengkap!"); return; }
+        pesertaName = name;
+        document.getElementById('login-overlay').style.display = 'none';
+        
+        shuffleOptions();
+        initQuiz();
+    }
+
+    function initQuiz() {
+        const container = document.getElementById('soalContainer');
+        const grid = document.getElementById('gridNav');
+        container.innerHTML = "";
+        grid.innerHTML = "";
+        questions.forEach((s, i) => {
+            const div = document.createElement('div');
+            div.className = 'q-wrapper';
+            div.id = `q${i}`;
+            let opts = s.o.map((opt, idx) => {
+                const char = String.fromCharCode(97 + idx);
+                return `<label><input type="radio" name="ans${i}" value="${char}" onchange="hAns(${i})"> ${char.toUpperCase()}. ${opt}</label>`;
+            }).join('');
+            div.innerHTML = `<div class="q-text">${i+1}. ${s.q}</div><div class="options">${opts}</div>`;
+            container.appendChild(div);
+
+            const btn = document.createElement('button');
+            btn.id = `nav${i}`; btn.innerText = i + 1;
+            btn.onclick = () => jump(i);
+            grid.appendChild(btn);
+        });
+        showSoal(0);
+    }
+
+    function hAns(idx) {
+        document.getElementById(`nav${idx}`).classList.add('done');
+        if (currentIdx < questions.length - 1) setTimeout(() => { move(1); }, 400);
+    }
+
+    function showSoal(idx) {
+        document.querySelectorAll('.q-wrapper').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById(`q${idx}`);
+        if(target) target.classList.add('active');
+        
+        document.querySelectorAll('.nav-grid button').forEach(el => el.classList.remove('current'));
+        const navBtn = document.getElementById(`nav${idx}`);
+        if(navBtn) navBtn.classList.add('current');
+        
+        document.getElementById('prevBtn').disabled = (idx === 0);
+        document.getElementById('nextBtn').innerText = (idx === questions.length - 1) ? "SELESAI" : "LANJUT";
+        currentIdx = idx;
+    }
+
+    function move(step) {
+        if (currentIdx === questions.length - 1 && step === 1) { finishQuiz(); return; }
+        showSoal(currentIdx + step);
+    }
+
+    function jump(idx) { showSoal(idx); }
+
+    function finishQuiz() {
+        if (!confirm("Akhiri simulasi sekarang?")) return;
+        let sc = 0;
+        const b = document.getElementById('rekapBody');
+        b.innerHTML = "";
+        questions.forEach((s, i) => {
+            const sel = document.querySelector(`input[name="ans${i}"]:checked`);
+            const u = sel ? sel.value : null;
+            const isC = (u === s.a); if (isC) sc++;
+            const uT = u ? s.o[u.charCodeAt(0) - 97] : "-";
+            const cT = s.o[s.a.charCodeAt(0) - 97];
+            const r = b.insertRow();
+            r.innerHTML = `<td>${i+1}</td><td><strong>KASUS:</strong> ${s.q}<br><small>Jawaban: (${u?u.toUpperCase():'-'}) ${uT} | Kunci: (${s.a.toUpperCase()}) ${cT}<br><em>Analis: ${s.exp}</em></small></td><td class="${isC?'status-benar':'status-salah'}">${isC?'BENAR':'SALAH'}</td>`;
+        });
+        const fS = (sc / questions.length) * 100;
+        document.getElementById('scoreText').innerText = fS.toFixed(0);
+        document.getElementById('displayUserName').innerText = pesertaName.toUpperCase();
+        document.getElementById('soalContainer').style.display = 'none';
+        document.getElementById('navFooter').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        window.scrollTo(0,0);
+    }
+
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("HASIL UJI KOMPUTER MS WORD - PERSONA RESEARCH & CONSULTING", 10, 15);
+        doc.text("Nama: " + pesertaName.toUpperCase() + " | Skor: " + document.getElementById('scoreText').innerText, 10, 25);
+        const rs = [];
+        questions.forEach((s, i) => {
+            const sel = document.querySelector(`input[name="ans${i}"]:checked`);
+            const isC = (sel && sel.value === s.a);
+            rs.push([i+1, s.q.substring(0, 50) + "...", isC ? "BENAR" : "SALAH"]);
+        });
+        doc.autoTable({ startY: 35, head: [['No', 'Kasus', 'Status']], body: rs });
+        doc.save(`Hasil_TKK_WORD_${pesertaName}.pdf`);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMULASI POWERPOINT SERI 1 - Persona Research & Consulting</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root { --gold: #D4AF37; --ivory: #FFFFF0; --black: #000000; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--ivory); color: var(--black); margin: 0; padding: 10px; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; user-select: none; -webkit-user-select: none; }
+        .container { max-width: 900px; background: white; margin: auto; padding: 25px; border-radius: 10px; border-top: 8px solid var(--black); box-shadow: 0 4px 20px rgba(0,0,0,0.15); flex: 1; display: flex; flex-direction: column; }
+        .header { text-align: center; border-bottom: 3px double var(--gold); margin-bottom: 20px; padding-bottom: 15px; }
+        .header h2 { margin: 0; font-size: 1.4em; font-weight: 900; text-transform: uppercase; color: var(--black); letter-spacing: 1px; }
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-box { background: white; padding: 50px 60px; border-radius: 15px; text-align: center; border-top: 8px solid var(--gold); width: 95%; max-width: 750px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .login-box h2 { font-size: 1.8em; margin-bottom: 10px; white-space: nowrap; }
+        .login-box input { width: 100%; padding: 18px; margin: 25px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 1.2em; text-align: center; font-weight: bold; }
+        .q-wrapper { display: none; width: 100%; }
+        .q-wrapper.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .q-text { color: #1a1a1a; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; border-left: 5px solid var(--gold); padding-left: 15px; text-align: justify; }
+        .options { display: grid; gap: 10px; }
+        .options label { display: flex; align-items: center; padding: 15px; background: #f9f9f9; border: 1.5px solid #eee; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .options label:hover { background: #fffcf0; border-color: var(--gold); }
+        .options input { margin-right: 15px; transform: scale(1.4); accent-color: var(--black); }
+        .nav-footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; }
+        .nav-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-bottom: 20px; }
+        .nav-grid button { padding: 8px 0; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 5px; }
+        .nav-grid button.done { background: var(--black); color: white; }
+        .nav-grid button.current { border: 2px solid var(--gold); font-weight: bold; }
+        .btn-action { background: var(--black); color: white; border: none; padding: 18px 40px; font-weight: bold; cursor: pointer; border-radius: 8px; text-transform: uppercase; transition: 0.3s; font-size: 1.1em; }
+        .btn-action:hover { background: var(--gold); }
+        #result-area { display: none; text-align: center; }
+        .score-val { font-size: 5em; font-weight: 900; color: var(--black); }
+        .rekap-table { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 0.85em; text-align: left; }
+        .rekap-table th, .rekap-table td { border: 1px solid #ddd; padding: 12px; }
+        .status-benar { color: green; font-weight: bold; }
+        .status-salah { color: red; font-weight: bold; }
+        .page-footer { text-align: center; padding: 20px; font-size: 0.9em; color: var(--black); font-weight: bold; }
+    </style>
+</head>
+<body oncontextmenu="return false" oncopy="return false" oncut="return false" onkeydown="return (event.keyCode != 123)">
+
+<div id="login-overlay">
+    <div class="login-box">
+        <h2 style="margin:0;">PERSONA RESEARCH & CONSULTING</h2>
+        <h3 style="color: var(--gold); margin-top:10px; letter-spacing: 2px;">SIMULASI TKK POWERPOINT SERI 1</h3>
+        <p style="font-size: 1.1em;">Modul Administrasi Paparan: Standarisasi Slide Master, Manajemen Elemen, dan Operasional Dasar.</p>
+        <input type="text" id="userNameInput" placeholder="MASUKKAN NAMA LENGKAP PESERTA..." autocomplete="off">
+        <button class="btn-action" onclick="startQuiz()">MULAI SIMULASI POWERPOINT</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h2>PERSONA RESEARCH & CONSULTING</h2>
+        <small style="color: var(--gold); font-weight: bold; letter-spacing: 1px;">MODUL: PRESENTATION ADMINISTRATION & STANDARDIZATION</small>
+    </div>
+
+    <form id="quizForm">
+        <div id="soalContainer"></div>
+        <div id="result-area">
+            <h3 id="displayUserName" style="color:var(--gold);"></h3>
+            <h2>SKOR AKHIR ANDA</h2>
+            <div class="score-val" id="scoreText">0</div>
+            <button type="button" class="btn-action" onclick="downloadPDF()">UNDUH BERITA ACARA (PDF)</button>
+            <div style="overflow-x: auto;">
+                <table class="rekap-table">
+                    <thead><tr><th>No</th><th>Analisis Situasi & Pembahasan Mendalam</th><th>Status</th></tr></thead>
+                    <tbody id="rekapBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+
+    <div class="nav-footer" id="navFooter">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <button class="btn-action" id="prevBtn" onclick="move(-1)" disabled>KEMBALI</button>
+            <button class="btn-action" id="nextBtn" onclick="move(1)">LANJUT</button>
+        </div>
+        <div class="nav-grid" id="gridNav"></div>
+    </div>
+</div>
+
+<footer class="page-footer">Persona Research & Consulting | Hotline: 0877 425 5786</footer>
+
+<script>
+    let pesertaName = "";
+    let questions = [
+        { q: "Seorang operator ditugaskan untuk menyusun draf paparan laporan rutin satuan kerja menggunakan aplikasi yang mampu menyajikan materi dalam berbagai tampilan visual agar instruksi pimpinan mudah dipahami. Program aplikasi yang paling tepat digunakan untuk kebutuhan tersebut adalah...", o: ["Microsoft Access", "Microsoft Word", "Microsoft Excel", "Microsoft PowerPoint"], a: "d", exp: "Microsoft PowerPoint adalah paket program Microsoft Office yang dirancang khusus untuk membuat presentasi dinamis dengan berbagai tampilan visual seperti teks, gambar, dan animasi." },
+        { q: "Dalam menyiapkan materi paparan pimpinan untuk rapat koordinasi, operator harus memastikan format file tersimpan dengan benar agar dapat dibuka di berbagai perangkat. Format file dokumen PowerPoint pada umumnya memiliki ekstensi...", o: [".xls", ".mdb", ".pptx", ".rtf"], a: "c", exp: "Ekstensi .ppt atau .pptx merupakan identitas standar untuk file presentasi PowerPoint, yang membedakannya dari spreadsheet (.xls) atau dokumen teks (.doc)." },
+        { q: "Operator diperintahkan untuk membuat draf paparan baru yang benar-benar orisinal tanpa menggunakan desain bawaan agar lebih kreatif dan tidak terlihat menjiplak. Pilihan terbaik saat pertama kali membuka program adalah...", o: ["Menggunakan template", "AutoContent Wizard", "Blank Presentation", "Tutorial Mode"], a: "c", exp: "Memulai dengan 'Blank Presentation' memberikan fleksibilitas penuh bagi operator untuk mendesain tata letak, warna, dan elemen presentasi secara mandiri sesuai kebutuhan satuan." },
+        { q: "Saat sedang menyusun materi paparan, pimpinan menginstruksikan untuk menyisipkan satu lembar slide tambahan di antara slide yang sudah ada. Langkah teknis yang paling tepat melalui tab menu Beranda (Home) adalah...", o: ["Insert - Group Slides - New Slides", "Home - Group Slides - New Slides", "Button - Insert - New Slides", "View - New Slide"], a: "b", exp: "Untuk menambahkan lembar kerja baru dalam presentasi, operator dapat mengakses menu Home, kemudian menuju grup Slides dan memilih perintah New Slide." },
+        { q: "Pimpinan menghendaki agar seluruh slide laporan memiliki format logo dan tata letak judul yang seragam secara otomatis tanpa perlu diatur manual satu per satu. Fitur yang digunakan untuk manajemen master presentasi tersebut adalah...", o: ["Home - Presentation Views - Slide Master", "Insert - Presentation Views - Slide Master", "View - Presentation Views - Slide Master", "Review - View - Slide Master"], a: "c", exp: "Slide Master (menu View) adalah fitur kunci untuk mengatur standarisasi tampilan seluruh slide secara massal, memastikan konsistensi desain dalam satu file presentasi." },
+        { q: "Dalam menyusun poin-poin arahan pimpinan, operator perlu menyisipkan simbol peluru atau penomoran agar urutan kerja terlihat jelas dan sistematis. Pengaturan ini dapat ditemukan pada...", o: ["Home - Font - Bullets and Numbering", "Home - Paragraph - Bullets and Numbering", "Home - Styles - Bullets and Numbering", "Design - Bullets and Numbering"], a: "b", exp: "Fitur Bullets and Numbering berfungsi untuk membuat daftar poin atau urutan angka, yang pengaturannya berada di grup Paragraph pada tab menu Home." },
+        { q: "Operator ingin menambahkan penjelasan teks secara bebas pada area slide yang tidak memiliki kotak input standar. Langkah yang benar untuk menyisipkan kotak teks tersebut adalah...", o: ["Insert - Group Text - Text Box", "Insert - Paragraph - Text Box", "Home - Group Text - Text Box", "Design - Group Text - Text Box"], a: "a", exp: "Text Box memungkinkan operator menambahkan teks di posisi mana pun pada slide. Fitur ini dapat diakses melalui menu Insert pada grup Text." },
+        { q: "Pimpinan meminta agar jenis huruf, ukuran, dan gaya tulisan pada draf paparan disesuaikan agar terlihat lebih tegas dan berwibawa. Menu utama yang menangani modifikasi huruf adalah...", o: ["Paragraph", "Styles", "Font", "Editing"], a: "c", exp: "Grup menu Font berisi perintah untuk mengubah jenis huruf, ukuran (size), warna, serta efek seperti tebal (bold) dan miring (italic) untuk memperkuat penekanan teks." },
+        { q: "Setelah draf paparan pimpinan selesai disusun, operator wajib melakukan penyimpanan ke memori komputer agar data tidak hilang. Shortcut keyboard tercepat untuk merekam presentasi tersebut adalah...", o: ["Ctrl - S", "Alt - S", "Shift - S", "Ctrl - M"], a: "a", exp: "Ctrl + S (Save) adalah kombinasi tombol standar untuk menyimpan perubahan pada dokumen secara cepat tanpa harus membuka menu File." },
+        { q: "Pimpinan ingin meninjau hasil tayangan paparan dalam tampilan penuh layar (Full Screen) sebelum rapat dimulai. Tombol pada keyboard yang berfungsi menjalankan presentasi secara cepat adalah...", o: ["F1", "F2", "F5", "ESC"], a: "c", exp: "Tombol F5 berfungsi sebagai shortcut untuk memulai Slide Show (tayangan slide) dari halaman pertama dalam tampilan layar penuh." },
+        { q: "Dalam lembar kerja PowerPoint, kotak yang membatasi suatu objek dan berfungsi sebagai tempat untuk memasukkan teks atau gambar dikenal dengan istilah...", o: ["Placeholder", "Pointer", "Text Box", "Lines"], a: "c", exp: "Text Box adalah wadah atau kotak yang digunakan untuk menampung teks yang dapat dipindahkan dan diatur ukurannya secara bebas di atas slide." },
+        { q: "Lembar kerja utama pada Microsoft PowerPoint tempat operator menyusun urutan materi dan elemen visual presentasi biasa disebut sebagai...", o: ["Clip", "Slide", "Layer", "Themes"], a: "b", exp: "Slide merupakan istilah untuk lembar kerja individual dalam PowerPoint. Kumpulan dari beberapa slide inilah yang membentuk satu file presentasi." },
+        { q: "Operator perlu menghentikan tayangan presentasi (Slide Show) secara mendadak karena adanya interupsi rapat. Tombol pada keyboard yang digunakan untuk keluar dari mode tayangan adalah...", o: ["ESC", "Delete", "Space", "Enter"], a: "a", exp: "Tombol ESC (Escape) berfungsi untuk membatalkan atau mengakhiri mode tampilan Slide Show dan kembali ke layar pengeditan." },
+        { q: "Pimpinan menginstruksikan penghapusan satu lembar slide yang sudah tidak diperlukan dalam materi paparan. Langkah teknis yang benar melalui menu Beranda adalah...", o: ["Home - Editing - Delete", "Home - Slides - Delete", "Insert - Slides - Delete", "View - Slides - Delete"], a: "b", exp: "Untuk menghapus slide, operator cukup memilih slide yang dimaksud kemudian menggunakan perintah Delete pada grup Slides di menu Home." },
+        { q: "Operator ingin menampilkan seluruh slide yang telah dibuat dalam bentuk ukuran kecil secara bersamaan untuk memudahkan pengecekan urutan paparan. Fitur ini disebut...", o: ["Slide Show", "Slide Sorter", "Print Preview", "Drawing Toolbar"], a: "b", exp: "Slide Sorter (Pengurut Slide) menampilkan miniatur semua slide agar operator dapat mengatur ulang urutan paparan dengan cara menarik (drag) slide tersebut." },
+        { q: "Dalam penekanan materi instruksi, operator ingin menggunakan format huruf miring agar teks terlihat berbeda. Istilah teknis untuk format teks miring adalah...", o: ["Bold", "Underline", "Italic", "Shadow"], a: "c", exp: "Italic adalah gaya huruf miring yang digunakan untuk memberikan penekanan pada kata atau frasa tertentu dalam naskah paparan." },
+        { q: "Operator dapat memindahkan posisi sebuah slide ke urutan lain secara instan hanya dengan menggeser kursor mouse. Teknik ini dalam istilah komputer dikenal sebagai...", o: ["Cut and Paste", "Move and Copy", "Take and Give", "Drag and Drop"], a: "d", exp: "Drag and Drop (Seret dan Lepas) adalah metode navigasi objek dengan menekan tombol mouse, menggesernya ke lokasi baru, lalu melepaskannya." },
+        { q: "Pimpinan meminta agar tata letak elemen pada satu slide dirubah untuk mengakomodasi gambar dokumentasi yang baru dimasukkan. Menu yang digunakan untuk merubah layout slide adalah...", o: ["Format - Slide", "Format - Layout", "Format - Style Layout", "Design - Layout"], a: "a", exp: "Perintah Format - Slide (atau Slide Layout) memungkinkan operator merubah kerangka penempatan teks dan gambar pada slide yang sedang aktif." },
+        { q: "Operator ingin merubah latar belakang (background) salah satu slide agar terlihat lebih kontras dan menarik sesuai arahan pimpinan. Menu yang harus diakses adalah...", o: ["Format - Monitor", "Format - Background", "Format - Shape Tool", "Design - Background"], a: "b", exp: "Menu Format - Background digunakan untuk mengatur warna, tekstur, atau gambar yang menjadi latar belakang lembar kerja slide." },
+        { q: "Jika operator ingin agar perubahan latar belakang hanya diterapkan pada slide yang sedang dibuka saat ini saja, maka pada kotak dialog harus menekan tombol...", o: ["Apply", "Apply to All", "Close", "OK"], a: "a", exp: "Tombol 'Apply' hanya memberlakukan perubahan pada slide yang sedang aktif, sedangkan 'Apply to All' akan merubah seluruh slide dalam file tersebut." },
+        { q: "Untuk menyisipkan bagan struktur organisasi satuan secara otomatis agar terlihat profesional dan mudah dimodifikasi, fitur yang digunakan adalah...", o: ["WordArt", "Clip Art", "Shapes", "SmartArt"], a: "d", exp: "SmartArt menyediakan template diagram siap pakai untuk struktur organisasi, proses, dan siklus yang dapat diisi dengan data secara dinamis." },
+        { q: "Pimpinan menghendaki judul paparan dibuat dengan variasi bentuk dan efek 3D agar terlihat artistik dan mewah. Fitur yang paling tepat adalah...", o: ["Text Box", "WordArt", "Clip Art", "Shapes"], a: "b", exp: "WordArt merupakan fitur dekoratif untuk merubah teks biasa menjadi objek grafis dengan berbagai efek warna, bayangan, dan bentuk tiga dimensi." },
+        { q: "Operator diperintahkan menyisipkan gambar dokumentasi yang berasal dari koleksi gambar standar bawaan aplikasi PowerPoint. Fitur yang digunakan adalah...", o: ["Insert Picture", "Insert Clip Art", "Insert Shapes", "Insert WordArt"], a: "b", exp: "Clip Art merupakan kumpulan ilustrasi atau gambar standar yang sudah tersedia di dalam pustaka Microsoft Office untuk memperkaya konten presentasi." },
+        { q: "Dalam pengaturan paragraf, pimpinan menginginkan teks instruksi dibuat rata ke arah kanan. Istilah untuk perataan teks kanan adalah...", o: ["Align Left", "Center", "Align Right", "Justify"], a: "c", exp: "Align Right (Rata Kanan) adalah pengaturan posisi teks agar sejajar pada batas margin kanan kotak teks atau slide." },
+        { q: "Operator ingin merubah skema warna teks dalam satu slide agar kombinasi warnanya lebih harmonis dan mudah dibaca. Kotak dialog yang digunakan adalah...", o: ["Color Scheme", "Background Color", "Clip Art Pattern", "Design Style"], a: "a", exp: "Color Scheme (Skema Warna) mengatur palet warna yang digunakan untuk teks, latar belakang, dan aksen elemen grafis pada slide." },
+        { q: "Operator ditugaskan mengelola file presentasi pimpinan yang ukurannya sangat besar agar dapat dikirim dengan lancar melalui jaringan internet. Teknik yang digunakan adalah...", o: ["Packing", "Extract", "Publish", "Zip"], a: "d", exp: "Mengemas file menjadi format .zip (kompresi) bertujuan mengecilkan ukuran data agar memudahkan proses pengiriman data lewat transmisi internet." },
+        { q: "Fitur yang digunakan untuk menghubungkan satu slide ke slide lainnya atau ke file dokumen eksternal secara instan melalui klik pada teks disebut...", o: ["Hyperslide", "Action", "Transition", "Hyperlink"], a: "d", exp: "Hyperlink berfungsi sebagai tautan navigasi yang memungkinkan kursor melompat ke tujuan tertentu (halaman lain atau file lain) saat teks tersebut diklik." },
+        { q: "Jika terdapat tautan hyperlink yang sudah tidak diperlukan lagi dalam paparan, operator dapat menghapusnya melalui perintah...", o: ["Remove Hyperlink", "Delete Link", "Backspace Hyperlink", "Undo Link"], a: "a", exp: "Perintah 'Remove Hyperlink' akan mencabut fungsi tautan pada teks namun tetap mempertahankan isi teks aslinya di dalam slide." },
+        { q: "Pimpinan meminta agar jarak antar baris kalimat dalam satu paragraf paparan tidak terlalu rapat. Pengaturan ini dapat dilakukan melalui menu...", o: ["Format - Spacing", "Format - Row Spacing", "Format - Line Spacing", "Format - Margin"], a: "a", exp: "Perintah Format - Spacing digunakan untuk mengatur kerapatan baris teks (line spacing) dan jarak antar paragraf agar lebih nyaman dibaca." },
+        { q: "Operator ingin membuat album foto dokumentasi kegiatan satuan dengan menambahkan banyak file foto sekaligus secara otomatis melalui menu...", o: ["Home - Photo Album", "Insert - Photo Album", "Insert - Picture", "Insert - Image"], a: "b", exp: "Fitur Photo Album pada menu Insert secara otomatis mengatur banyak gambar ke dalam urutan slide presentasi dengan tata letak yang rapi." },
+        { q: "Animasi yang muncul pada saat terjadi pergantian dari satu lembar slide ke lembar slide berikutnya disebut sebagai...", o: ["Efek Slide", "Efek Animasi", "Efek Transisi", "Media Clip"], a: "c", exp: "Efek Transisi adalah gaya animasi khusus yang mengatur bagaimana slide 'masuk' menggantikan slide sebelumnya selama tayangan berlangsung." },
+        { q: "Untuk memberikan efek visual saat sebuah objek teks atau gambar pertama kali muncul ke dalam slide, operator menggunakan kategori animasi...", o: ["Entrance", "Exit", "Emphasis", "Motion"], a: "a", exp: "Entrance (Pintu Masuk) adalah kategori animasi yang mengatur cara objek muncul atau datang ke dalam tampilan slide." },
+        { q: "Operator ingin mengatur detail urutan, durasi, dan waktu pemunculan setiap animasi pada elemen slide melalui panel khusus. Fitur ini disebut...", o: ["Slide Design", "Animation Schemes", "Custom Animation", "Design Template"], a: "c", exp: "Custom Animation memungkinkan operator memiliki kendali penuh untuk memodifikasi, mengurutkan, dan memberikan efek suara pada setiap animasi objek." },
+        { q: "Pimpinan ingin agar slide berpindah secara otomatis ke halaman berikutnya setelah durasi waktu tertentu tanpa perlu diklik manual. Opsi yang diatur adalah...", o: ["On Mouse Click", "Automatically Before", "Automatically After", "In Mouse Click"], a: "c", exp: "Automatically After digunakan untuk mengatur pewaktuan (timing) agar slide berpindah sendiri setelah jeda detik yang ditentukan." },
+        { q: "Untuk menyisipkan file video dokumentasi lapangan dengan ekstensi standar ke dalam materi presentasi, operator menggunakan format...", o: ["AVI", "DAT", "VCD", "MP3"], a: "a", exp: "AVI (Audio Video Interleave) adalah salah satu format file video standar yang didukung untuk disisipkan ke dalam slide PowerPoint." },
+        { q: "Proses menyimpan atau mengunggah file presentasi ke dalam jaringan internet internal agar dapat diakses via browser dikenal dengan istilah...", o: ["Halaman Web", "Halaman Text", "Home Page", "Publishing"], a: "a", exp: "Menyimpan presentasi sebagai 'Halaman Web' (.html) memungkinkan dokumen tersebut dibuka dan dijalankan melalui aplikasi penjelajah internet." },
+        { q: "Operator ingin membuka file paparan operasional yang sudah pernah disimpan sebelumnya di dalam direktori komputer. Shortcut keyboard-nya adalah...", o: ["Alt - O", "Shift - O", "Ctrl - O", "Space - O"], a: "c", exp: "Ctrl + O (Open) memunculkan kotak dialog untuk mencari dan membuka file presentasi yang sudah tersimpan." },
+        { q: "Pintasan keyboard (shortcut) yang paling cepat digunakan untuk menggandakan atau menyalin satu lembar slide yang dipilih adalah...", o: ["Ctrl - X", "Ctrl - C", "Ctrl - E", "Ctrl - M"], a: "b", exp: "Ctrl + C (Copy) digunakan untuk menyalin data atau slide ke memori sementara (clipboard) untuk kemudian ditempelkan kembali." },
+        { q: "Jika operator ingin membuat atau menyisipkan satu lembar slide baru tepat di posisi kursor aktif, shortcut yang digunakan adalah...", o: ["Ctrl - M", "Alt - M", "Shift - M", "Ctrl - I"], a: "a", exp: "Ctrl + M (New Slide) adalah perintah cepat untuk menambahkan slide baru tanpa harus masuk ke menu Home." },
+        { q: "Untuk menyeleksi atau memilih seluruh objek teks dan gambar dalam satu slide secara sekaligus, operator menekan tombol...", o: ["Ctrl - X", "Ctrl - M", "Ctrl - S", "Ctrl - A"], a: "d", exp: "Ctrl + A (Select All) berfungsi untuk menyorot atau memilih seluruh elemen yang ada pada slide yang aktif." },
+        { q: "Pimpinan meminta agar draf laporan disimpan dengan nama file yang berbeda untuk memisahkan antara draf asli dan draf revisi. Perintah yang digunakan adalah...", o: ["Alt - F - S", "Alt - F - A", "Alt - F - X", "Alt - F - N"], a: "b", exp: "Save As (Alt - F - A) memungkinkan operator menyimpan dokumen yang sama dengan nama baru atau di lokasi penyimpanan yang berbeda." },
+        { q: "Operator ingin merubah gaya garis bingkai pada sebuah kotak teks di dalam slide agar terlihat lebih tebal. Menu yang digunakan adalah...", o: ["Format - More Colors", "Format - Background", "Format - Colors and Lines", "Format - Lines"], a: "d", exp: "Menu Format - Lines digunakan khusus untuk memodifikasi atribut garis seperti ketebalan, jenis garis, dan warna bingkai objek." },
+        { q: "Untuk menutup file presentasi yang sedang dikerjakan tanpa harus keluar dari program aplikasi PowerPoint, langkah yang benar adalah...", o: ["Klik File - Page Setup", "Klik File - Open", "Klik File - Paper", "Klik File - Close"], a: "d", exp: "Perintah File - Close hanya menutup dokumen yang aktif, sementara aplikasi PowerPoint itu sendiri tetap berjalan." },
+        { q: "Bagian jendela PowerPoint yang menurut data inventaris teknis tidak termasuk dalam kategori elemen utama tampilan interface adalah...", o: ["Baris Judul", "Baris Menu", "Baris Slide", "Baris Status"], a: "d", exp: "Baris Status (Status Bar) memberikan informasi tambahan di bagian bawah, namun bukan merupakan elemen navigasi utama slide." },
+        { q: "Operator diperintahkan menyisipkan gambar dokumentasi kegiatan dalam format standar agar file tidak terlalu besar namun kualitas tetap terjaga. Format tersebut adalah...", o: ["WAV", "JPEG", "MP3", "HTM"], a: "b", exp: "JPEG merupakan format kompresi gambar standar yang paling umum didukung untuk dimasukkan ke dalam elemen visual presentasi." },
+        { q: "Saat menyampaikan materi paparan di depan audiens, media komunikasi visual utama yang paling dominan digunakan adalah...", o: ["Video", "Gambar", "Suara", "Sinyal"], a: "b", exp: "Presentasi visual mengandalkan Gambar (termasuk grafik dan diagram) sebagai media utama penyampaian pesan kepada audiens." },
+        { q: "Sistem presentasi yang dilakukan secara langsung antara penyaji dan audiens yang berada di lokasi berbeda melalui teknologi komunikasi disebut...", o: ["Teleconference", "Presentasi Absolut", "Presentasi Langsung", "Presentasi Normal"], a: "a", exp: "Teleconference adalah metode komunikasi interaktif jarak jauh yang mendukung pengiriman audio dan video secara bersamaan." },
+        { q: "Operator ingin merubah pola desain seluruh slide secara massal menggunakan tema yang sudah disediakan oleh sistem aplikasi. Menu yang diakses adalah...", o: ["Insert - Picture", "Slide Show - Set Up", "Insert - Media Clip", "Design - Themes"], a: "d", exp: "Menu Design - Themes berisi kumpulan template desain profesional yang mengatur warna, font, dan latar belakang seluruh slide secara seragam." },
+        { q: "Dalam navigasi tayangan slide show, perintah yang tidak dikenal untuk membawa tampilan ke halaman tertentu menurut standar teknis adalah...", o: ["Center Slide", "Previous Slide", "Next Slide", "Last Slide"], a: "a", exp: "Navigasi Slide Show hanya mendukung perpindahan ke halaman Sebelumnya (Previous), Selanjutnya (Next), atau Akhir (Last)." },
+        { q: "Pimpinan meminta disisipkan bagan grafik yang menggambarkan data statistik hasil operasi. Menu Insert yang digunakan secara spesifik adalah...", o: ["Diagram", "Picture", "Text Box", "Chart"], a: "d", exp: "Menu Insert - Chart digunakan untuk menyisipkan berbagai jenis grafik (batang, lingkaran, garis) berdasarkan data numerik ke dalam slide." }
+    ];
+
+    function shuffleOptions() {
+        questions.forEach(q => {
+            const correctText = q.o[q.a.charCodeAt(0) - 97];
+            q.o.sort(() => Math.random() - 0.5);
+            q.a = String.fromCharCode(97 + q.o.indexOf(correctText));
+        });
+    }
+
+    let currentIdx = 0;
+    const expiredDate = "2028-07-01";
+
+    function startQuiz() {
+        const today = new Date().toISOString().split('T')[0];
+        if (today > expiredDate) { alert("Masa berlaku link telah berakhir."); return; }
+        const name = document.getElementById('userNameInput').value.trim();
+        if (!name) { alert("Masukkan Nama Lengkap!"); return; }
+        pesertaName = name;
+        document.getElementById('login-overlay').style.display = 'none';
+        shuffleOptions();
+        initQuiz();
+    }
+
+    function initQuiz() {
+        const container = document.getElementById('soalContainer');
+        const grid = document.getElementById('gridNav');
+        container.innerHTML = "";
+        grid.innerHTML = "";
+        questions.forEach((s, i) => {
+            const div = document.createElement('div');
+            div.className = 'q-wrapper';
+            div.id = `q${i}`;
+            let opts = s.o.map((opt, idx) => {
+                const char = String.fromCharCode(97 + idx);
+                return `<label><input type="radio" name="ans${i}" value="${char}" onchange="hAns(${i})"> ${char.toUpperCase()}. ${opt}</label>`;
+            }).join('');
+            div.innerHTML = `<div class="q-text">${i+1}. ${s.q}</div><div class="options">${opts}</div>`;
+            container.appendChild(div);
+
+            const btn = document.createElement('button');
+            btn.id = `nav${i}`; btn.innerText = i + 1;
+            btn.onclick = () => jump(i);
+            grid.appendChild(btn);
+        });
+        showSoal(0);
+    }
+
+    function hAns(idx) {
+        document.getElementById(`nav${idx}`).classList.add('done');
+        if (currentIdx < questions.length - 1) setTimeout(() => { move(1); }, 400);
+    }
+
+    function showSoal(idx) {
+        document.querySelectorAll('.q-wrapper').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById(`q${idx}`);
+        if(target) target.classList.add('active');
+        
+        document.querySelectorAll('.nav-grid button').forEach(el => el.classList.remove('current'));
+        const navBtn = document.getElementById(`nav${idx}`);
+        if(navBtn) navBtn.classList.add('current');
+        
+        document.getElementById('prevBtn').disabled = (idx === 0);
+        document.getElementById('nextBtn').innerText = (idx === questions.length - 1) ? "SELESAI" : "LANJUT";
+        currentIdx = idx;
+    }
+
+    function move(step) {
+        if (currentIdx === questions.length - 1 && step === 1) { finishQuiz(); return; }
+        showSoal(currentIdx + step);
+    }
+
+    function jump(idx) { showSoal(idx); }
+
+    function finishQuiz() {
+        if (!confirm("Akhiri simulasi Seri 1 sekarang?")) return;
+        let sc = 0;
+        const b = document.getElementById('rekapBody');
+        b.innerHTML = "";
+        questions.forEach((s, i) => {
+            const sel = document.querySelector(`input[name="ans${i}"]:checked`);
+            const u = sel ? sel.value : null;
+            const isC = (u === s.a); if (isC) sc++;
+            const uT = u ? s.o[u.charCodeAt(0) - 97] : "-";
+            const cT = s.o[s.a.charCodeAt(0) - 97];
+            const r = b.insertRow();
+            r.innerHTML = `<td>${i+1}</td><td><strong>SITUASI OPERASIONAL:</strong> ${s.q}<br><small>Jawaban Anda: (${u?u.toUpperCase():'-'}) ${uT} | Kunci: (${s.a.toUpperCase()}) ${cT}<br><strong>PEMBAHASAN TEKNIS:</strong> ${s.exp}</small></td><td class="${isC?'status-benar':'status-salah'}">${isC?'BENAR':'SALAH'}</td>`;
+        });
+        const fS = (sc / questions.length) * 100;
+        document.getElementById('scoreText').innerText = fS.toFixed(0);
+        document.getElementById('displayUserName').innerText = pesertaName.toUpperCase();
+        document.getElementById('soalContainer').style.display = 'none';
+        document.getElementById('navFooter').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        window.scrollTo(0,0);
+    }
+
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(14);
+        doc.text("BERITA ACARA HASIL SIMULASI TKK POWERPOINT SERI 1", 105, 15, { align: "center" });
+        doc.setFontSize(12);
+        doc.text("INSTANSI: PERSONA RESEARCH & CONSULTING", 105, 22, { align: "center" });
+        doc.text("__________________________________________________________________", 105, 25, { align: "center" });
+        doc.text("NAMA PESERTA : " + pesertaName.toUpperCase(), 15, 35);
+        doc.text("SKOR AKHIR    : " + document.getElementById('scoreText').innerText, 15, 42);
+        const rs = [];
+        questions.forEach((s, i) => {
+            const sel = document.querySelector(`input[name="ans${i}"]:checked`);
+            const isC = (sel && sel.value === s.a);
+            rs.push([i+1, s.q.substring(0, 80) + "...", isC ? "BENAR" : "SALAH"]);
+        });
+        doc.autoTable({ startY: 50, head: [['No', 'Uraian Situasi', 'Status']], body: rs, theme: 'grid', headStyles: { fillStyle: 'dark', fillColor: [0, 0, 0] } });
+        doc.save(`BA_Hasil_PPT_S1_${pesertaName}.pdf`);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMULASI EXCEL SERI 2 - Persona Research & Consulting</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root { --gold: #D4AF37; --ivory: #FFFFF0; --black: #000000; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--ivory); color: var(--black); margin: 0; padding: 10px; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; user-select: none; -webkit-user-select: none; }
+        .container { max-width: 900px; background: white; margin: auto; padding: 25px; border-radius: 10px; border-top: 8px solid var(--black); box-shadow: 0 4px 20px rgba(0,0,0,0.15); flex: 1; display: flex; flex-direction: column; }
+        .header { text-align: center; border-bottom: 3px double var(--gold); margin-bottom: 20px; padding-bottom: 15px; }
+        .header h2 { margin: 0; font-size: 1.4em; font-weight: 900; text-transform: uppercase; color: var(--black); letter-spacing: 1px; }
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-box { background: white; padding: 50px 60px; border-radius: 15px; text-align: center; border-top: 8px solid var(--gold); width: 95%; max-width: 750px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .login-box h2 { font-size: 1.8em; margin-bottom: 10px; white-space: nowrap; }
+        .login-box input { width: 100%; padding: 18px; margin: 25px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 1.2em; text-align: center; font-weight: bold; }
+        .q-wrapper { display: none; width: 100%; }
+        .q-wrapper.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .q-text { color: #1a1a1a; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; border-left: 5px solid var(--gold); padding-left: 15px; text-align: justify; }
+        .options { display: grid; gap: 10px; }
+        .options label { display: flex; align-items: center; padding: 15px; background: #f9f9f9; border: 1.5px solid #eee; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .options label:hover { background: #fffcf0; border-color: var(--gold); }
+        .options input { margin-right: 15px; transform: scale(1.4); accent-color: var(--black); }
+        .nav-footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; }
+        .nav-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-bottom: 20px; }
+        .nav-grid button { padding: 8px 0; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 5px; }
+        .nav-grid button.done { background: var(--black); color: white; }
+        .nav-grid button.current { border: 2px solid var(--gold); font-weight: bold; }
+        .btn-action { background: var(--black); color: white; border: none; padding: 18px 40px; font-weight: bold; cursor: pointer; border-radius: 8px; text-transform: uppercase; transition: 0.3s; font-size: 1.1em; }
+        .btn-action:hover { background: var(--gold); }
+        #result-area { display: none; text-align: center; }
+        .score-val { font-size: 5em; font-weight: 900; color: var(--black); }
+        .rekap-table { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 0.85em; text-align: left; }
+        .rekap-table th, .rekap-table td { border: 1px solid #ddd; padding: 12px; }
+        .status-benar { color: green; font-weight: bold; }
+        .status-salah { color: red; font-weight: bold; }
+        .page-footer { text-align: center; padding: 20px; font-size: 0.9em; color: var(--black); font-weight: bold; }
+    </style>
+</head>
+<body oncontextmenu="return false" oncopy="return false" oncut="return false" onkeydown="return (event.keyCode != 123)">
+
+<div id="login-overlay">
+    <div class="login-box">
+        <h2 style="margin:0;">PERSONA RESEARCH & CONSULTING</h2>
+        <h3 style="color: var(--gold); margin-top:10px; letter-spacing: 2px;">SIMULASI TKK EXCEL SERI 2</h3>
+        <p style="font-size: 1.1em;">Fokus: Manajemen Teks (String), Logika Administrasi (IF), dan Optimasi Laporan.</p>
+        <input type="text" id="userNameInput" placeholder="MASUKKAN NAMA LENGKAP PESERTA..." autocomplete="off">
+        <button class="btn-action" onclick="startQuiz()">MULAI SIMULASI SERI 2</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h2>PERSONA RESEARCH & CONSULTING</h2>
+        <small style="color: var(--gold); font-weight: bold; letter-spacing: 1px;">MODUL: STRING, LOGIC & REPORT OPTIMIZATION</small>
+    </div>
+
+    <form id="quizForm">
+        <div id="soalContainer"></div>
+        <div id="result-area">
+            <h3 id="displayUserName" style="color:var(--gold);"></h3>
+            <h2>SKOR AKHIR ANDA</h2>
+            <div class="score-val" id="scoreText">0</div>
+            <button type="button" class="btn-action" onclick="downloadPDF()">UNDUH HASIL DAN PEMBAHASAN (PDF)</button>
+            <div style="overflow-x: auto;">
+                <table class="rekap-table">
+                    <thead><tr><th>No</th><th>Analisis Situasi & Pembahasan</th><th>Status</th></tr></thead>
+                    <tbody id="rekapBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+
+    <div class="nav-footer" id="navFooter">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <button class="btn-action" id="prevBtn" onclick="move(-1)" disabled>KEMBALI</button>
+            <button class="btn-action" id="nextBtn" onclick="move(1)">LANJUT</button>
+        </div>
+        <div class="nav-grid" id="gridNav"></div>
+    </div>
+</div>
+
+<footer class="page-footer">Persona Research & Consulting | Hotline: 0877 4251 5786</footer>
+
+<script>
+    let pesertaName = "";
+    // 50 Soal Seri 2 Excel: Teks, Logika, dan Operasional
+    let questions = [
+        { q: "Operator sedang mengolah database personel di mana digit pertama dari nomor registrasi menunjukkan satuan kerja. Fungsi yang digunakan untuk mengambil 1 karakter dari sisi kiri data tersebut adalah...", o: ["LEFT", "RIGHT", "MID", "VALUE"], a: "a", exp: "Fungsi LEFT digunakan untuk mengambil sejumlah karakter dari bagian awal (kiri) suatu teks." },
+        { q: "Dalam sebuah daftar nilai seleksi, operator perlu menentukan secara otomatis apakah seorang calon memenuhi ambang batas atau tidak. Fungsi logika yang digunakan untuk kondisi 'Jika... Maka...' adalah...", o: ["SUMIF", "COUNTIF", "IF", "VLOOKUP"], a: "c", exp: "Fungsi IF digunakan untuk melakukan pengujian logika dan memberikan hasil sesuai kondisi yang terpenuhi." },
+        { q: "Operator perlu mengambil 3 digit kode kategori yang terletak di tengah-tengah nomor surat dinas (contoh: 2026/POL/001). Fungsi teks yang digunakan adalah...", o: ["LEFT", "RIGHT", "MID", "VALUE"], a: "c", exp: "Fungsi MID digunakan untuk mengambil sejumlah karakter dari posisi tertentu di tengah-tengah teks." },
+        { q: "Dalam laporan hasil ujian, operator ingin mengetahui peringkat (ranking) seorang peserta dibandingkan dengan seluruh peserta lainnya. Fungsi yang digunakan adalah...", o: ["RANK", "LARGE", "SMALL", "COUNT"], a: "a", exp: "Fungsi RANK digunakan untuk menentukan posisi urutan (peringkat) suatu nilai dalam daftar nilai." },
+        { q: "Operator memiliki data angka yang terformat sebagai teks. Agar data tersebut bisa dijumlahkan kembali secara matematis, fungsi yang digunakan untuk mengubah teks menjadi numerik adalah...", o: ["LEFT", "RIGHT", "MID", "VALUE"], a: "d", exp: "Fungsi VALUE mengubah data bertipe teks yang berisi angka menjadi format angka (numerik) asli." },
+        { q: "Pimpinan meminta agar digit terakhir pada nomor seri inventaris (contoh: 8990-X) dipisahkan ke kolom baru. Fungsi teks yang tepat adalah...", o: ["LEFT", "RIGHT", "MID", "VALUE"], a: "b", exp: "Fungsi RIGHT digunakan untuk mengambil sejumlah karakter dari bagian akhir (kanan) suatu teks." },
+        { q: "Operator ingin menghitung berapa banyak sel dalam suatu range yang berisi angka (misal: menghitung jumlah peserta yang sudah input nilai). Fungsi yang digunakan adalah...", o: ["COUNT", "COUNTA", "COUNTIF", "SUM"], a: "a", exp: "Fungsi COUNT menghitung jumlah sel yang berisi data numerik (angka)." },
+        { q: "Dalam klasifikasi berkas, operator ingin mencari nilai tertinggi kedua dari seluruh skor yang ada. Fungsi statistik yang tepat adalah...", o: ["MAX", "LARGE", "RANK", "SUM"], a: "b", exp: "Fungsi LARGE dapat mencari nilai terbesar ke-n (misal terbesar ke-2) dalam suatu kumpulan data." },
+        { q: "Sebaliknya, jika operator diperintahkan untuk mencari nilai terkecil ketiga dari suatu rentang data, maka fungsi yang digunakan adalah...", o: ["MIN", "SMALL", "RANK", "COUNT"], a: "b", exp: "Fungsi SMALL digunakan untuk mencari nilai terkecil ke-n dalam suatu rentang data." },
+        { q: "Fungsi yang digunakan untuk mengubah seluruh huruf dalam satu sel menjadi huruf kapital semua (UPPERCASE) adalah...", o: ["LOWER", "UPPER", "PROPER", "TEXT"], a: "b", exp: "Fungsi UPPER merubah semua karakter teks menjadi huruf besar seluruhnya." },
+        { q: "Untuk merubah semua teks menjadi huruf kecil semua, operator menggunakan fungsi...", o: ["LOWER", "UPPER", "PROPER", "TEXT"], a: "a", exp: "Fungsi LOWER digunakan untuk merubah teks menjadi huruf kecil seluruhnya." },
+        { q: "Operator ingin agar huruf pertama dari setiap kata dalam sel menjadi huruf kapital (seperti penulisan nama orang). Fungsi yang tepat adalah...", o: ["UPPER", "LOWER", "PROPER", "TEXT"], a: "c", exp: "Fungsi PROPER merubah huruf pertama setiap kata menjadi kapital dan sisanya menjadi huruf kecil." },
+        { q: "Dalam persiapan cetak, operator ingin menambahkan teks di bagian atas halaman (Header) atau bawah halaman (Footer). Perintah ini dijalankan melalui menu...", o: ["File", "Insert", "View", "Format"], a: "b", exp: "Menu Insert memuat opsi untuk menyisipkan Header and Footer dalam dokumen Excel." },
+        { q: "Operator ingin mengurutkan data personel berdasarkan abjad dari A ke Z. Fitur yang digunakan adalah...", o: ["Filter", "Sort", "Validation", "Consolidate"], a: "b", exp: "Sort digunakan untuk mengurutkan data secara alfabetis (A-Z) atau numerik (terkecil ke terbesar)." },
+        { q: "Untuk menyaring data sehingga hanya menampilkan kriteria tertentu saja (misal: hanya pangkat 'Bripda'), operator menggunakan fitur...", o: ["Sort", "Filter", "Goal Seek", "Group"], a: "b", exp: "Fitur Filter (AutoFilter) digunakan untuk memilah dan menampilkan data berdasarkan kriteria spesifik." },
+        { q: "Saat mengetik rumus yang merujuk pada tabel referensi di sheet lain, operator perlu mengunci sel agar tidak bergeser saat ditarik (copy). Simbol yang digunakan untuk mengunci sel adalah...", o: ["#", "@", "$", "*"], a: "c", exp: "Simbol $ (Dollar) digunakan untuk membuat referensi sel menjadi absolut (terkunci)." },
+        { q: "Pimpinan meminta agar area tabel tertentu saja yang dicetak, bukan seluruh isi worksheet. Fitur yang digunakan di Page Layout adalah...", o: ["Print Area", "Print Titles", "Margins", "Orientation"], a: "a", exp: "Set Print Area menentukan bagian spesifik dari worksheet yang akan dicetak oleh printer." },
+        { q: "Operator ingin agar judul kolom tabel tetap terlihat di layar meskipun ia melakukan scroll jauh ke bawah. Fitur yang digunakan adalah...", o: ["Split", "Freeze Panes", "Zoom", "New Window"], a: "b", exp: "Freeze Panes mengunci baris atau kolom tertentu agar tetap terlihat saat lembar kerja digeser." },
+        { q: "Dalam sebuah rumus logika, operator ingin menggabungkan dua kondisi (misal: Nilai > 70 DAN Absensi > 80). Fungsi tambahan yang digunakan di dalam IF adalah...", o: ["OR", "AND", "NOT", "XOR"], a: "b", exp: "Fungsi AND digunakan untuk memastikan semua syarat pengujian terpenuhi (bernilai benar)." },
+        { q: "Jika operator ingin syarat terpenuhi apabila 'salah satu' dari beberapa kondisi benar, maka fungsi yang digunakan adalah...", o: ["AND", "OR", "NOT", "IFERROR"], a: "b", exp: "Fungsi OR memberikan hasil benar jika minimal salah satu kondisi pengujian terpenuhi." },
+        { q: "Operator ingin menghitung jumlah karakter (termasuk spasi) dalam sebuah sel teks. Fungsi yang digunakan adalah...", o: ["COUNT", "LEN", "VALUE", "TEXT"], a: "b", exp: "Fungsi LEN (Length) menghitung total jumlah karakter yang ada dalam suatu sel." },
+        { q: "Untuk menggabungkan teks dari dua sel berbeda (misal: Nama Depan dan Nama Belakang) menjadi satu sel, operator menggunakan simbol...", o: ["+", "&", "$", "@"], a: "b", exp: "Simbol Ampersand (&) digunakan sebagai operator untuk menggabungkan (concatenate) teks." },
+        { q: "Dalam penyusunan laporan, operator ingin menyembunyikan (Hide) kolom yang berisi data sensitif tanpa menghapusnya. Caranya adalah klik kanan pada header kolom lalu pilih...", o: ["Delete", "Clear", "Hide", "Format"], a: "c", exp: "Fitur Hide menyembunyikan kolom atau baris dari tampilan tanpa menghilangkan data di dalamnya." },
+        { q: "Untuk merubah lebar kolom agar otomatis menyesuaikan dengan isi teks terpanjang di dalamnya, operator melakukan...", o: ["Drag margin", "Double klik batas kolom", "Klik kanan Format", "Ubah font"], a: "b", exp: "Double klik pada batas header kolom akan menjalankan fungsi 'AutoFit' lebar kolom." },
+        { q: "Operator ingin memberikan warna latar belakang sel (Fill Color) berdasarkan kondisi tertentu secara otomatis (misal: nilai merah jika di bawah 60). Fitur ini disebut...", o: ["Format Painter", "Conditional Formatting", "Styles", "Theme"], a: "b", exp: "Conditional Formatting merubah format sel secara otomatis berdasarkan aturan atau kriteria tertentu." },
+        { q: "Fungsi yang digunakan untuk mencari sebuah nilai pada kolom paling kiri dari suatu tabel dan mengambil data dari kolom lain yang sejajar adalah...", o: ["VLOOKUP", "HLOOKUP", "LOOKUP", "MATCH"], a: "a", exp: "VLOOKUP (Vertical Lookup) mencari data secara vertikal berdasarkan kata kunci di kolom pertama." },
+        { q: "Jika tabel referensi disusun secara mendatar (horizontal), maka fungsi pencarian yang digunakan adalah...", o: ["VLOOKUP", "HLOOKUP", "INDEX", "CHOOSE"], a: "b", exp: "HLOOKUP (Horizontal Lookup) mencari data pada baris pertama tabel dan mengambil nilai di baris bawahnya." },
+        { q: "Dalam laporan berkala, operator ingin memunculkan tanggal hari ini secara otomatis yang selalu diperbarui setiap file dibuka. Fungsi yang digunakan adalah...", o: ["DATE()", "NOW()", "TODAY()", "TIME()"], a: "c", exp: "Fungsi TODAY() menampilkan tanggal sistem saat ini tanpa menyertakan informasi waktu." },
+        { q: "Jika operator ingin memunculkan tanggal beserta waktu (jam) saat ini secara mendetail, fungsi yang digunakan adalah...", o: ["TODAY()", "NOW()", "CLOCK()", "TIME()"], a: "b", exp: "Fungsi NOW() menampilkan tanggal dan waktu sistem secara lengkap." },
+        { q: "Operator ingin memberikan komentar (catatan kaki) pada sel tertentu tanpa merubah isinya. Caranya adalah klik kanan pada sel lalu pilih...", o: ["Insert Comment", "Format Cells", "Hyperlink", "Clear Content"], a: "a", exp: "Insert Comment (atau New Note) digunakan untuk menyisipkan catatan tambahan pada sel." },
+        { q: "Untuk merubah tampilan angka 0.75 menjadi 75%, operator menekan ikon...", o: ["Currency", "Comma Style", "Percent Style", "Increase Decimal"], a: "c", exp: "Percent Style mengalikan nilai dengan 100 dan menampilkan simbol persen." },
+        { q: "Operator ingin menambah jumlah angka di belakang koma (desimal). Ikon yang diklik adalah...", o: ["Decrease Decimal", "Increase Decimal", "Merge", "Wrap Text"], a: "b", exp: "Increase Decimal menambah digit angka di belakang tanda koma untuk ketelitian data." },
+        { q: "Dalam tabel yang sempit, operator ingin teks yang panjang otomatis turun ke baris baru dalam sel yang sama (teks tidak memanjang ke samping). Fitur ini adalah...", o: ["Merge Cells", "Wrap Text", "Shrink to fit", "Justify"], a: "b", exp: "Wrap Text memaksa teks panjang terlipat ke baris baru sehingga lebar kolom tetap terjaga." },
+        { q: "Untuk menggabungkan beberapa sel menjadi satu sel besar dan memposisikan teks di tengah, operator menggunakan...", o: ["Wrap Text", "Merge & Center", "Center Across", "Align Center"], a: "b", exp: "Merge & Center menggabungkan beberapa sel terpilih dan mengatur perataan teks ke tengah." },
+        { q: "Operator ingin memindahkan worksheet ke posisi urutan terakhir. Perintah yang dipilih pada tab sheet adalah...", o: ["Rename", "Delete", "Move or Copy", "Select All"], a: "c", exp: "Move or Copy digunakan untuk memindahkan atau menduplikasi lembar kerja ke posisi lain." },
+        { q: "Dalam audit data, operator ingin memastikan tidak ada data ganda (duplikat). Fitur yang digunakan di tab Data adalah...", o: ["Consolidate", "Remove Duplicates", "Validation", "Flash Fill"], a: "b", exp: "Remove Duplicates secara otomatis menghapus baris data yang isinya sama persis." },
+        { q: "Operator ingin membatasi input pada sebuah sel agar hanya bisa diisi oleh angka 1 sampai 10 saja. Fitur ini disebut...", o: ["Data Filtering", "Data Validation", "Consolidation", "Group Data"], a: "b", exp: "Data Validation digunakan untuk menetapkan aturan atau batasan input data pada sel." },
+        { q: "Shortcut keyboard untuk melakukan perintah 'Undo' (membatalkan kesalahan) adalah...", o: ["Ctrl + C", "Ctrl + V", "Ctrl + Z", "Ctrl + Y"], a: "c", exp: "Ctrl + Z adalah pintasan untuk perintah Undo." },
+        { q: "Sedangkan shortcut untuk perintah 'Redo' (mengulangi kembali yang sudah di-undo) adalah...", o: ["Ctrl + R", "Ctrl + Y", "Ctrl + Z", "Ctrl + P"], a: "b", exp: "Ctrl + Y adalah pintasan untuk perintah Redo." },
+        { q: "Operator ingin menyeleksi seluruh baris (row) secara cepat menggunakan keyboard. Pintasan yang ditekan adalah...", o: ["Ctrl + Space", "Shift + Space", "Alt + Space", "Ctrl + A"], a: "b", exp: "Shift + Space digunakan untuk menyeleksi seluruh baris tempat kursor berada." },
+        { q: "Pintasan keyboard untuk menyeleksi seluruh kolom (column) secara cepat adalah...", o: ["Ctrl + Space", "Shift + Space", "Alt + Space", "Ctrl + Enter"], a: "a", exp: "Ctrl + Space digunakan untuk menyeleksi seluruh kolom tempat kursor berada." },
+        { q: "Dalam penyusunan laporan keuangan, operator ingin membagi tampilan layar menjadi dua jendela yang bisa di-scroll secara terpisah. Fitur ini adalah...", o: ["Freeze Panes", "Split", "New Window", "Arrange All"], a: "b", exp: "Fitur Split membagi area kerja menjadi dua atau empat bagian yang independen dalam satu layar." },
+        { q: "Operator ingin merubah data yang tadinya berbentuk baris menjadi kolom (ditukar posisinya). Fitur Paste Special yang digunakan adalah...", o: ["Values", "Formulas", "Transpose", "Formats"], a: "c", exp: "Transpose menukar orientasi data dari baris ke kolom atau sebaliknya." },
+        { q: "Untuk menghapus semua format sel (warna, bingkai) tanpa menghapus isi datanya, operator memilih menu...", o: ["Clear All", "Clear Contents", "Clear Formats", "Delete"], a: "c", exp: "Clear Formats menghapus pengaturan visual sel tanpa menghilangkan teks atau angka di dalamnya." },
+        { q: "Operator ingin menyalin hanya 'hasil angka' dari sebuah rumus tanpa menyertakan rumusnya. Pilihan Paste Special-nya adalah...", o: ["Paste Formulas", "Paste Values", "Paste Formats", "Paste Link"], a: "b", exp: "Paste Values hanya menempelkan hasil akhir saja, berguna jika file sumber rumus akan dihapus." },
+        { q: "Fungsi yang digunakan untuk menghitung nilai masa depan dari suatu investasi berdasarkan bunga tetap adalah...", o: ["PV", "FV", "PMT", "NPV"], a: "b", exp: "FV (Future Value) menghitung nilai investasi di masa yang akan datang." },
+        { q: "Fungsi statistik yang digunakan untuk menghitung jumlah sel yang memenuhi kriteria tertentu (misal: jumlah orang yang nilainya > 75) adalah...", o: ["COUNT", "COUNTIF", "SUMIF", "AVERAGEIF"], a: "b", exp: "COUNTIF menghitung banyaknya data berdasarkan satu syarat/kriteria spesifik." },
+        { q: "Fungsi yang digunakan untuk menjumlahkan nilai angka hanya jika memenuhi syarat tertentu adalah...", o: ["SUM", "COUNTIF", "SUMIF", "IF"], a: "c", exp: "SUMIF melakukan penjumlahan nilai pada sel yang memenuhi kriteria tertentu." },
+        { q: "Operator ingin mencari posisi urutan suatu kata dalam sebuah daftar. Fungsi yang digunakan adalah...", o: ["MATCH", "INDEX", "VLOOKUP", "FIND"], a: "a", exp: "Fungsi MATCH mengembalikan posisi relatif dari suatu item dalam rentang data." },
+        { q: "Shortcut keyboard untuk memasukkan tanggal hari ini secara instan ke dalam sel adalah...", o: ["Ctrl + ;", "Ctrl + Shift + :", "Ctrl + D", "Ctrl + T"], a: "a", exp: "Ctrl + Semikolon (;) adalah cara tercepat memasukkan tanggal sistem secara statis ke dalam sel." }
+    ];
+
+    function shuffleOptions() {
+        questions.forEach(q => {
+            const correctText = q.o[q.a.charCodeAt(0) - 97];
+            q.o.sort(() => Math.random() - 0.5);
+            q.a = String.fromCharCode(97 + q.o.indexOf(correctText));
+        });
+    }
+
+    let currentIdx = 0;
+    const expiredDate = "2028-07-01";
+
+    function startQuiz() {
+        const today = new Date().toISOString().split('T')[0];
+        if (today > expiredDate) { alert("Masa berlaku link telah berakhir."); return; }
+        const name = document.getElementById('userNameInput').value.trim();
+        if (!name) { alert("Masukkan Nama Lengkap!"); return; }
+        pesertaName = name;
+        document.getElementById('login-overlay').style.display = 'none';
+        shuffleOptions();
+        initQuiz();
+    }
+
+    function initQuiz() {
+        const container = document.getElementById('soalContainer');
+        const grid = document.getElementById('gridNav');
+        container.innerHTML = "";
+        grid.innerHTML = "";
+        questions.forEach((s, i) => {
+            const div = document.createElement('div');
+            div.className = 'q-wrapper';
+            div.id = `q${i}`;
+            let opts = s.o.map((opt, idx) => {
+                const char = String.fromCharCode(97 + idx);
+                return `<label><input type="radio" name="ans${i}" value="${char}" onchange="hAns(${i})"> ${char.toUpperCase()}. ${opt}</label>`;
+            }).join('');
+            div.innerHTML = `<div class="q-text">${i+1}. ${s.q}</div><div class="options">${opts}</div>`;
+            container.appendChild(div);
+
+            const btn = document.createElement('button');
+            btn.id = `nav${i}`; btn.innerText = i + 1;
+            btn.onclick = () => jump(i);
+            grid.appendChild(btn);
+        });
+        showSoal(0);
+    }
+
+    function hAns(idx) {
+        document.getElementById(`nav${idx}`).classList.add('done');
+        if (currentIdx < questions.length - 1) setTimeout(() => { move(1); }, 400);
+    }
+
+    function showSoal(idx) {
+        document.querySelectorAll('.q-wrapper').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById(`q${idx}`);
+        if(target) target.classList.add('active');
+        
+        document.querySelectorAll('.nav-grid button').forEach(el => el.classList.remove('current'));
+        const navBtn = document.getElementById(`nav${idx}`);
+        if(navBtn) navBtn.classList.add('current');
+        
+        document.getElementById('prevBtn').disabled = (idx === 0);
+        document.getElementById('nextBtn').innerText = (idx === questions.length - 1) ? "SELESAI" : "LANJUT";
+        currentIdx = idx;
+    }
+
+    function move(step) {
+        if (currentIdx === questions.length - 1 && step === 1) { finishQuiz(); return; }
+        showSoal(currentIdx + step);
+    }
+
+    function jump(idx) { showSoal(idx); }
+
+    function finishQuiz() {
+        if (!confirm("Akhiri simulasi Seri 2 sekarang?")) return;
+        let sc = 0;
+        const b = document.getElementById('rekapBody');
+        b.innerHTML = "";
+        questions.forEach((s, i) => {
+            const sel = document.querySelector(`input[name="ans${i}"]:checked`);
+            const u = sel ? sel.value : null;
+            const isC = (u === s.a); if (isC) sc++;
+            const uT = u ? s.o[u.charCodeAt(0) - 97] : "-";
+            const cT = s.o[s.a.charCodeAt(0) - 97];
+            const r = b.insertRow();
+            r.innerHTML = `<td>${i+1}</td><td><strong>SITUASI:</strong> ${s.q}<br><small>Jawaban Anda: (${u?u.toUpperCase():'-'}) ${uT} | Kunci: (${s.a.toUpperCase()}) ${cT}<br><strong>PEMBAHASAN:</strong> ${s.exp}</small></td><td class="${isC?'status-benar':'status-salah'}">${isC?'BENAR':'SALAH'}</td>`;
+        });
+        const fS = (sc / questions.length) * 100;
+        document.getElementById('scoreText').innerText = fS.toFixed(0);
+        document.getElementById('displayUserName').innerText = pesertaName.toUpperCase();
+        document.getElementById('soalContainer').style.display = 'none';
+        document.getElementById('navFooter').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        window.scrollTo(0,0);
+    }
+
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(14);
+        doc.text("BERITA ACARA HASIL SIMULASI TKK EXCEL SERI 2", 105, 15, { align: "center" });
+        doc.setFontSize(12);
+        doc.text("INSTANSI: PERSONA RESEARCH & CONSULTING", 105, 22, { align: "center" });
+        doc.text("__________________________________________________________________", 105, 25, { align: "center" });
+        doc.text("NAMA PESERTA : " + pesertaName.toUpperCase(), 15, 35);
+        doc.text("SKOR AKHIR    : " + document.getElementById('scoreText').innerText, 15, 42);
+        const rs = [];
+        questions.forEach((s, i) => {
+            const sel = document.querySelector(`input[name="ans${i}"]:checked`);
+            const isC = (sel && sel.value === s.a);
+            rs.push([i+1, s.q.substring(0, 80) + "...", isC ? "BENAR" : "SALAH"]);
+        });
+        doc.autoTable({ startY: 50, head: [['No', 'Uraian Situasi', 'Status']], body: rs, theme: 'grid', headStyles: { fillStyle: 'dark', fillColor: [0, 0, 0] } });
+        doc.save(`BA_Hasil_EXCEL_S2_${pesertaName}.pdf`);
+    }
+</script>
+</body>
+</html>
